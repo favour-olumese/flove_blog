@@ -3,10 +3,17 @@
 {% block content %}
 
     {% if form.errors %}
-        <p>Your username and password didn't match. Please try again.</p>
+        {% for field, error in form.errors.items %}
+        <li style="color: red;">{{ error }}</li>
+        {% endfor %}
     {% endif %}
 
-    <form method="post" action=>
+    {% if email_error %}
+        <li style="color: red;">{{ email_error }}</li>
+        <!-- TODO: Add a login text if email already exist -->
+    {% endif %}
+
+    <form method="post" action="">
         {% csrf_token %}
         <table>
             <tr>
@@ -28,7 +35,6 @@
         </table>
 
         <input type="submit" value="Register">
-        <input type="hidden" name="next" value="{{ next }}">
     </form>
 
 {% endblock %}
