@@ -3,7 +3,9 @@ from .forms import UserRegistrationForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.models import User
-from verify_email.email_handler import send_verification_email
+from django.contrib.auth import get_user_model
+from django_email_verification import send_email
+
 
 
 def home(request):
@@ -24,7 +26,13 @@ def register_user(request):
 
         if form.is_valid():
             form.save(commit=False)
-            # user_email = form.cleaned_data['email']
+            user_email = form.cleaned_data['email']
+            user_username = form.cleaned_data['username']
+            user_password = form.cleaned_data['password1']
+
+            user = get_user_model().objects.create(username=user_username, email=user_email, password=user_password)
+            user.is_active = False  # Example
+            send_email(user)
 
             # # Check if email already exist in the database.
             # email_exist = User.objects.get(email=user_email)
@@ -35,11 +43,6 @@ def register_user(request):
             #         'email_error':'Email already exist.'
             #     }
             #     return render(request, 'registration/register.html', context)
-            
-            inactive_user = send_verification_email(request, form)
-            # form.save()
-            # From Django-Verify-Email 2.0.3 docs
-            # The user is already being saved as inactive and you don't have to .save() it explicitly.
             
 
             return HttpResponseRedirect(reverse('home'))

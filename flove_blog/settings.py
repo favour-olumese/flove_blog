@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog.apps.BlogConfig',
-    'verify_email.apps.VerifyEmailConfig',
+    'django_email_verification',
 ]
 
 MIDDLEWARE = [
@@ -128,11 +128,26 @@ LOGIN_REDIRECT_URL = '/'
 
 LOGOUT_REDIRECT_URL = '/'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# https://pypi.org/project/django-email-verification/
+def verified_callback(user):
+    user.is_active = True
+
+
+EMAIL_VERIFIED_CALLBACK = verified_callback
+EMAIL_FROM_ADDRESS = 'favour.pytest@gmail.com'
+EMAIL_MAIL_SUBJECT = 'Confirm your email {{ user.username }}'
+EMAIL_MAIL_HTML = 'registration/mail_body.html'
+EMAIL_MAIL_PLAIN = 'registration/mail_body.txt'
+EMAIL_MAIL_TOKEN_LIFE = 60 * 60
+EMAIL_MAIL_PAGE_TEMPLATE = 'registration/confirm_template.html'
+EMAIL_PAGE_DOMAIN = 'http://127.0.0.1:7000/'
+# EMAIL_MULTI_USER = True  # optional (defaults to False)
+
+# For Django Email Backend
+EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
+EMAIL_HOST_USER = 'favour.pytest@gmail.com'
+EMAIL_HOST_PASSWORD = 'cfhzprijeoungcne'
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-
-DEFAULT_FROM_EMAIL = 'noreply<no_reply@domain.com>'
