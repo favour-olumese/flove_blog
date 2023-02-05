@@ -30,8 +30,11 @@ def register_user(request):
             user_username = form.cleaned_data['username']
             user_password = form.cleaned_data['password1']
 
-            user = get_user_model().objects.create(username=user_username, email=user_email, password=user_password)
-            user.is_active = False  # Example
+            user = User.objects.create_user(username=user_username, email=user_email, password=user_password)
+            
+            # Make user unactive until they click link to token in email
+            user.is_active = False
+
             send_email(user)
 
             # # Check if email already exist in the database.
@@ -45,6 +48,6 @@ def register_user(request):
             #     return render(request, 'registration/register.html', context)
             
 
-            return HttpResponseRedirect(reverse('home'))
+            return HttpResponseRedirect(reverse('login'))
 
     return render(request, 'registration/register.html', {'form':form})
