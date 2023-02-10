@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 
 class Writer(models.Model):
@@ -33,6 +34,8 @@ class Article(models.Model):
     class Meta:
         ordering = ['-update_date']
 
+    def get_absolute_url(self):
+        return reverse('article-detail', kwargs={'pk': self.pk})
 
     def __str__(self):
         return f'{self.title} by {self.writer}'
