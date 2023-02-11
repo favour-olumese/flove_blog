@@ -1,0 +1,10 @@
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        Are you sure you want to delete <strong>{{ article.title }}</strong>.
+        {{ form }}
+        <br>
+        <input type="submit" value="Yes">
+        <!-- <input value="Cancel" > -->
+    </form>
+{% endblock %}

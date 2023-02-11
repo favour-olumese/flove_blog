@@ -5,5 +5,13 @@
             <p>{{ article.title }}</p>
         </a>
         <small>{{ article.writer }}</small>
+
+        {% if request.user == article.writer.user %}
+            <a href="{% url 'update-article' article.id %}">Update</a>
+            <a href="{% url 'delete-article' article.id %}">Delete</a>
+        {% endif %}
     </div>
+
+{% empty %}
+    <p>There are no articles</p>
 {% endfor %}
