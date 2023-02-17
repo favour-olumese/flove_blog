@@ -1,6 +1,8 @@
 {% block content %}
+    {{user}}
+    {{ user.writer }}
 
-    {% for article in my_articles %}
+    {% for article in article_list %}
     <div style="border-style: solid;">
         <a href="{{ article.get_absolute_url }}">
             <p>{{ article.title }}</p>
@@ -13,7 +15,7 @@
         {% endif %}
     </div>
 
-{% empty %}
+    {% empty %}
     <p>There are no articles</p>
-{% endfor %}
+    {% endfor %}
 {% endblock %}

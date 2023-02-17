@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import UserRegistrationForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
@@ -60,13 +60,13 @@ def register_user(request):
 class ArticleListView(ListView):
     model = Article
 
-class MyArticleListView(ListView):
+class MyArticleListView(LoginRequiredMixin, ListView):
     # queryset = Article.objects.filter(user=self.request.user)
     template_name = 'blog/writer_articles.html'
     context_object_name = 'my_articles'
 
     def get_queryset(self):
-        return Article.objects.filter(user=self.request.user)
+        return Article.objects.filter(writer=self.request.user.writer)
 
 
 class ArticleDetailView(DetailView):
@@ -119,3 +119,26 @@ class WriterCreateView(LoginRequiredMixin, CreateView):
         """Method to assign writer's detail to current user."""
         form.instance.user = self.request.user
         return super().form_valid(form)
+
+
+class WriterDetailView(DetailView):
+    model = User
+    slug_url_kwarg = 'username'
+    template_name = 'blog/writer_detail.html'
+
+    def get_context_data(self, **kwargs):
+        """Function to add article of user as context in the template."""
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+
+        # Get the username in the url
+        user_name = self.kwargs['username']
+        user = User.objects.filter(username=user_name)[0]
+        
+        context['article_list'] = Article.objects.filter(writer=user.writer)
+        return context
+
+    def get_object(self, queryset=None):
+        """Function to assign field of the User model that would be used for the url kwarg"""
+        username = self.kwargs.get(self.slug_url_kwarg)
+        return get_object_or_404(self.model, username=username)
