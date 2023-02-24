@@ -1,11 +1,23 @@
 {% block content %}
 
+    <!-- For filtering articles -->
+    <form action="{% url 'filter' %}" method="get">
+        <select name="article_status" id="filter">
+            <option value="p">Public</option>
+            <option value="u">Unlisted</option>
+            <option value="a">All Published</option>
+        </select>
+
+        <input type="submit" value="Submit">
+    </form>
+
     {% for article in my_articles %}
     <div style="border-style: solid;">
         <a href="{{ article.get_absolute_url }}">
             <p>{{ article.title }}</p>
         </a>
         <small>{{ article.writer }}</small>
+        <small>{{ article.get_article_status_display }}</small>
 
         {% if request.user == article.writer.user %}
             <a href="{% url 'update-article' article.id %}">Update</a>
@@ -13,7 +25,7 @@
         {% endif %}
     </div>
 
-{% empty %}
-    <p>There are no articles</p>
-{% endfor %}
+    {% empty %}
+        <p>There are no articles</p>
+    {% endfor %}
 {% endblock %}

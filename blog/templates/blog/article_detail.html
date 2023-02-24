@@ -1,4 +1,9 @@
 {% block content %}
-    <h3>{{ article.title }}</h3>
-    <p>{{ article.text|linebreaks }}</p>
+
+    {% if article.article_status == 'd' and request.user != article.writer.user %}
+        <p>Not accessible</p>
+    {% else %}
+        <h3>{{ article.title }}</h3>
+        <p>{{ article.text|linebreaks }}</p>
+    {% endif%}
 {% endblock %}

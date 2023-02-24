@@ -1,19 +1,41 @@
 {% block content %}
-    {{user}}
+    {{ user }}
     {{ user.writer }}
 
-    {% for article in article_list %}
-    <div style="border-style: solid;">
-        <a href="{{ article.get_absolute_url }}">
-            <p>{{ article.title }}</p>
-        </a>
-        <small>{{ article.writer }}</small>
+    {% if request.user == user %}
+        <a href="{% url 'drafts' %}">Drafts</a>
+        <a href="{% url 'new-article' %}">New Article</a>
+        <!-- For filtering articles -->
+        <form action="{% url 'filter' %}" method="get">
+            <select name="article_status" id="filter">
+                <option value="p">Public</option>
+                <option value="u">Unlisted</option>
+                <option value="a">All Published</option>
+            </select>
 
-        {% if request.user == article.writer.user %}
-            <a href="{% url 'update-article' article.id %}">Update</a>
-            <a href="{% url 'delete-article' article.id %}">Delete</a>
+            <input type="submit" value="Submit">
+        </form>
+    {% endif %}
+
+    {% for article in article_list %}
+        <!-- Ensures that only user can see unlisted articles -->
+        {% if article.article_status == 'u' and request.user.writer != article.writer %}
+            <div></div>
+        
+        {% else %}
+            <div style="border-style: solid;">
+                <a href="{{ article.get_absolute_url }}">
+                    <p>{{ article.title }}</p>
+                </a>
+                <small>{{ article.writer }}</small>
+                <small>{{ article.get_article_status_display }}</small>
+
+                {% if request.user == article.writer.user %}
+                    <a href="{% url 'update-article' article.id %}">Update</a>
+                    <a href="{% url 'delete-article' article.id %}">Delete</a>
+                {% endif %}
+            </div>
         {% endif %}
-    </div>
 
     {% empty %}
     <p>There are no articles</p>

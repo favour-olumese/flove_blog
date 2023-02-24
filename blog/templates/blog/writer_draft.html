@@ -1,4 +1,3 @@
-
 {% for article in article_list %}
     <div style="border-style: solid;">
         <a href="{{ article.get_absolute_url }}">
@@ -7,10 +6,8 @@
         <small>{{ article.writer }}</small>
         <small>{{ article.get_article_status_display }}</small>
 
-        {% if request.user == article.writer.user %}
-            <a href="{% url 'update-article' article.id %}">Update</a>
-            <a href="{% url 'delete-article' article.id %}">Delete</a>
-        {% endif %}
+        <a href="{% url 'update-article' article.id %}">Update</a>
+        <a href="{% url 'delete-article' article.id %}">Delete</a>
     </div>
 
 {% empty %}
