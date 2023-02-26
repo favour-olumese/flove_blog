@@ -1,4 +1,10 @@
+{% extends 'blog/base.html' %}
 
+{% block title %}
+    <title>Articles | Flove</title>
+{% endblock %}
+
+{% block content %}
 {% for article in article_list %}
     <div style="border-style: solid;">
         <a href="{{ article.get_absolute_url }}">
@@ -8,11 +14,13 @@
         <small>{{ article.get_article_status_display }}</small>
 
         {% if request.user == article.writer.user %}
-            <a href="{% url 'update-article' article.id %}">Update</a>
-            <a href="{% url 'delete-article' article.id %}">Delete</a>
+            <a href="{% url 'update-article' article.writer.user article.article_url %}">Update</a>
+            <a href="{% url 'delete-article' article.writer.user article.article_url %}">Delete</a>
         {% endif %}
     </div>
 
 {% empty %}
     <p>There are no articles</p>
 {% endfor %}
+
+{% endblock %}

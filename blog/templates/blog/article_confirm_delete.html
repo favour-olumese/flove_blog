@@ -1,3 +1,9 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}
+    <title>Delete {{ article.title }} | Flove</title>
+{% endblock %}
+
 {% block content %}
     <form method="post">
         {% csrf_token %}

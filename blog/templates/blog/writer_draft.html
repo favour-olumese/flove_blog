@@ -1,3 +1,9 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}
+    <title>My Drafts</title>
+{% endblock %}
+
 {% for article in article_list %}
     <div style="border-style: solid;">
         <a href="{{ article.get_absolute_url }}">
@@ -6,8 +12,8 @@
         <small>{{ article.writer }}</small>
         <small>{{ article.get_article_status_display }}</small>
 
-        <a href="{% url 'update-article' article.id %}">Update</a>
-        <a href="{% url 'delete-article' article.id %}">Delete</a>
+        <a href="{% url 'update-article' article.writer.user article.article_url %}">Update</a>
+        <a href="{% url 'delete-article' article.writer.user article.article_url %}">Delete</a>
     </div>
 
 {% empty %}

@@ -1,5 +1,10 @@
-{% block content %}
+{% extends 'blog/base.html' %}
 
+{% block title %}
+    <title>{{ article.title }} | Flove</title>
+{% endblock %}
+
+{% block content %}
     {% if article.article_status == 'd' and request.user != article.writer.user %}
         <p>Not accessible</p>
     {% else %}

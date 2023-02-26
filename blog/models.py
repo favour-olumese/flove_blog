@@ -40,6 +40,7 @@ class Article(models.Model):
     pub_date = models.DateTimeField(auto_now_add=True) 
     update_date = models.DateTimeField(auto_now=True)
     article_status = models.CharField(max_length=1, choices=ARTICLE_STATUS, default='d')
+    article_url = models.CharField(max_length=120)
     # article_tag = models.CharField(max_length=100)
 
 
@@ -49,7 +50,7 @@ class Article(models.Model):
     def get_absolute_url(self):
         """Returns url of each article."""
 
-        return reverse('article-detail', kwargs={'pk': self.pk})
+        return reverse('article-detail', kwargs={'article_url':self.article_url, 'username':self.writer.user})
 
     def __str__(self):
         """Returns article title."""

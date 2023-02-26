@@ -10,6 +10,8 @@ from blog.models import Article, Writer
 from django.contrib.auth.mixins import LoginRequiredMixin,  UserPassesTestMixin
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.decorators import login_required
+from django.utils.text import slugify
+from uuid import uuid4
 
 
 def home(request):
@@ -71,6 +73,16 @@ class ArticleDetailView(DetailView):
     """Content of each article view."""
 
     model = Article
+    slug_url_kwarg = 'article_url'
+    slug_url_kwarg2 = 'username'
+
+    def get_object(self, queryset=None):
+        """Function to assign field of the User model that would be used for the url kwarg."""
+
+        article_url = self.kwargs.get(self.slug_url_kwarg)
+        user_name = self.kwargs.get(self.slug_url_kwarg2)
+
+        return get_object_or_404(self.model, article_url=article_url)
 
 
 class ArticleCreateView(LoginRequiredMixin, CreateView):
@@ -78,21 +90,27 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
 
     model = Article
     fields = ['article_img', 'title', 'text', 'article_status']
-    success_url = '/articles/'
 
     def form_valid(self, form):
-        """Assigns article to current user."""
+        """Assigns article to current user and use article title to create url path."""
 
         article_writer = Writer.objects.filter(user=self.request.user)[0]
         form.instance.writer = article_writer
+
+        # Adding random hash the end of article title to make url unique.
+        random_slug = str(uuid4())[:8]
+        form.instance.article_url = slugify(form.instance.title + ' ' + random_slug)
+
         return super().form_valid(form)
 
 
 class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """View for updating articles."""
 
-    queryset = Article.objects.all()
+    model = Article
     fields = ['article_img', 'title', 'text', 'article_status']
+    slug_url_kwarg = 'article_url'
+    slug_url_kwarg2 = 'username'
 
     def test_func(self):
         """"Works with UserPassesTestMixin.
@@ -101,8 +119,9 @@ class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         but returns False when current user is not the article onwer.
         """
 
-        article = Article.objects.filter(id=self.kwargs['pk'])[0]
+        article = Article.objects.filter(article_url=self.kwargs['article_url'])[0]
         return article.writer.user == self.request.user
+
 
     def handle_no_permission(self, *kwargs):
         """Redirect current user who is not article owner to the article page.
@@ -110,7 +129,15 @@ class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         By default, test_func redirects user who do not own the article to the 403 page.
         """
         
-        return redirect(reverse_lazy('article-detail', kwargs={'pk': self.kwargs['pk']}))
+        return redirect(reverse_lazy('article-detail', kwargs={'article_url':str(self.kwargs['article_url']), 'username':str(self.kwargs['username'])}))
+
+    def get_object(self, queryset=None):
+        """Function to assign article_url of the Article model to the url kwarg."""
+
+        article_url = self.kwargs.get(self.slug_url_kwarg)
+        user_name = self.kwargs.get(self.slug_url_kwarg2)
+
+        return get_object_or_404(self.model, article_url=article_url)
 
 
 class ArticleDeleteView(LoginRequiredMixin, DeleteView):
@@ -118,6 +145,16 @@ class ArticleDeleteView(LoginRequiredMixin, DeleteView):
 
     model = Article
     success_url = reverse_lazy('articles')
+    slug_url_kwarg = 'article_url'
+    slug_url_kwarg2 = 'username'
+
+    def  get_object(self, queryset=None):
+        """Function to assign article_url of the Article model to the url kwarg."""
+
+        article_url =self.kwargs.get(self.slug_url_kwarg)
+        user_name = self.kwargs.get(self.slug_url_kwarg2)
+
+        return get_object_or_404(self.model, article_url=article_url)
 
 
 class MyArticleListView(LoginRequiredMixin, ListView):
