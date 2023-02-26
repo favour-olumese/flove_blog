@@ -8,6 +8,7 @@ urlpatterns = [
     path('articles/', views.ArticleListView.as_view(), name='articles'),
     path('article/create/', views.ArticleCreateView.as_view(), name='new-article'),
     path('@<str:username>/', views.WriterDetailView.as_view(), name='writer'),
+    path('@<str:username>/profile/update/', views.WriterUpdateView.as_view(), name='writer-profile-update'),
     path('@<str:username>/<slug:article_url>/', views.ArticleDetailView.as_view(), name='article-detail'),
     path('@<str:username>/<slug:article_url>/update/', views.ArticleUpdateView.as_view(), name='update-article'),
     path('@<str:username>/<slug:article_url>/delete/', views.ArticleDeleteView.as_view(), name='delete-article'),

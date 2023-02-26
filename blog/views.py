@@ -122,7 +122,6 @@ class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         article = Article.objects.filter(article_url=self.kwargs['article_url'])[0]
         return article.writer.user == self.request.user
 
-
     def handle_no_permission(self, *kwargs):
         """Redirect current user who is not article owner to the article page.
 
@@ -189,8 +188,8 @@ class ArticleDraftListView(LoginRequiredMixin, ListView):
 @login_required
 def article_filter(request):
     """Function for writer to view all published, unlisted, or public articles."""
-    article_status = request.GET.get('article_status')
 
+    article_status = request.GET.get('article_status')
     writer = request.user.writer
 
     # All articles
@@ -210,7 +209,7 @@ class WriterCreateView(LoginRequiredMixin, CreateView):
     """View for creating writer profile."""
 
     model = Writer
-    fields = ['profile_picture', 'first_name', 'last_name', 'bio']
+    fields = ['profile_picture', 'first_name', 'last_name', 'bio', 'display_email']
     success_url = ''
 
     def form_valid(self, form):
@@ -219,15 +218,55 @@ class WriterCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
+class WriterUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """View for updating user details."""
+    
+    model = Writer
+    fields = ['profile_picture', 'first_name', 'last_name', 'bio', 'display_email']
+    slug_url_kwarg = 'username'
+
+    def get_object(self, queryset=None):
+        """Function to assign field of the User model that would be used for the url kwarg."""
+
+        # Get writer user_id
+        username = self.kwargs.get(self.slug_url_kwarg)
+        user_id = User.objects.filter(username=username).values()[0]['id']
+
+        return get_object_or_404(self.model, user=user_id)
+
+    def test_func(self):
+        """"Works with UserPassesTestMixin.
+
+        Returns True when current user is the profile onwer;
+        but returns False when current user is not.
+        """
+
+        username = self.kwargs['username']
+        user_id = User.objects.filter(username=username).values()[0]['id']
+        writer = Writer.objects.filter(user=user_id)[0]
+
+        return writer.user == self.request.user
+
+    def handle_no_permission(self, *kwargs):
+        """Redirect current user who is not profile owner to the user page.
+
+        By default, test_func redirects user who do not own the profile to the 403 page.
+        """
+        
+        return redirect(reverse_lazy('writer', kwargs={'username':self.kwargs['username']}))
+
+
+
 class WriterDetailView(DetailView):
     """View of writer page."""
 
-    model = User
+    model = Writer
     slug_url_kwarg = 'username'
     template_name = 'blog/writer_detail.html'
 
     def get_context_data(self, **kwargs):
         """Function to add article of user as context in the template."""
+        
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
 
@@ -241,5 +280,8 @@ class WriterDetailView(DetailView):
     def get_object(self, queryset=None):
         """Function to assign field of the User model that would be used for the url kwarg."""
 
+        # Get writer user_id
         username = self.kwargs.get(self.slug_url_kwarg)
-        return get_object_or_404(self.model, username=username)
+        user_id = User.objects.filter(username=username).values()[0]['id']
+
+        return get_object_or_404(self.model, user=user_id)

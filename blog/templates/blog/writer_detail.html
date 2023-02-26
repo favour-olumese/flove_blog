@@ -1,12 +1,27 @@
 {% extends 'blog/base.html' %}
 
 {% block title %}
-    <title>{{ user }} | Flove</title>
+    <title>{{ writer }} | Flove</title>
+{% endblock %}
+
+{% block sidebar %}
+    {% if writer.profile_picture %}
+        <p>{{ writer.profile_picture }}</p>
+    {% endif %}
+    <h3>{{ writer }}</h3>
+
+    {% if writer.bio %}
+        <b>Biography</b>
+        <p>{{ writer.bio }}</p>
+    {% endif %}
+
+    {% if writer.display_email %}
+        <b>Email</b>
+        <p>{{ writer.user.email }}</p>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
-    {{ user }}
-    {{ user.writer }}
 
     {% if request.user == user %}
         <a href="{% url 'drafts' %}">Drafts</a>

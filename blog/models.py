@@ -12,11 +12,18 @@ class Writer(models.Model):
     last_name = models.CharField(max_length=30)
     profile_picture = models.ImageField(upload_to='user_img', null=True, blank=True)
     bio = models.TextField(null= True, blank=True)
+    display_email = models.BooleanField(default=False)
+    
     # TODO: Add field for links to social media pages.
 
 
     class Meta:
         ordering = ['last_name', 'first_name']
+
+    def get_absolute_url(self):
+        """Returns url of each writer."""
+
+        return reverse('writer', kwargs={'username':self.user})
 
     def __str__(self):
         """Returns writer's name."""
@@ -27,6 +34,7 @@ class Writer(models.Model):
 class Article(models.Model):
     """Class for articles."""
 
+    # Choices to make articles either draft, public, or unlisted.
     ARTICLE_STATUS = (
     ('d', 'Draft'),
     ('p', 'Public'),
