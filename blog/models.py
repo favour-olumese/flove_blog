@@ -13,9 +13,8 @@ class Writer(models.Model):
     profile_picture = models.ImageField(upload_to='user_img', null=True, blank=True)
     bio = models.TextField(null= True, blank=True)
     display_email = models.BooleanField(default=False)
-    
-    # TODO: Add field for links to social media pages.
-
+    website_url = models.URLField(null= True, blank=True)
+    linkedin_url = models.URLField(null= True, blank=True)
 
     class Meta:
         ordering = ['last_name', 'first_name']

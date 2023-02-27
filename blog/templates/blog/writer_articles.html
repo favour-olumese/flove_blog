@@ -1,7 +1,20 @@
 {% extends 'blog/base.html' %}
 
 {% block title %}
-    <title>{{ article.writer }} Articles | Flove</title>
+    <title>
+        {% if article_status == 'p' %}
+            {{ writer }} Public Articles 
+
+        {% elif article_status == 'u' %}
+            {{ writer }} Unlisted Articles 
+
+        <!-- All article is controlled by a view
+            that does not have the writer context. -->
+        {% else %}
+            {{ request.user.writer }} Articles 
+        {% endif %}
+        | Flove
+    </title>
 {% endblock %}
 
 {% block content %}
@@ -10,8 +23,13 @@
     <form action="{% url 'filter' %}" method="get">
         <select name="article_status" id="filter">
             <option value="p">Public</option>
-            <option value="u">Unlisted</option>
-            <option value="a">All Published</option>
+
+            <option value="u" {% if article_status == 'u' %}
+            selected="selected"{% endif %}>Unlisted</option>
+
+            <option value="a" {% if article_status == None %}
+            selected="selected"{% endif %}>All Published</option>
+
         </select>
 
         <input type="submit" value="Submit">

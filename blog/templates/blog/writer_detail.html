@@ -17,13 +17,26 @@
 
     {% if writer.display_email %}
         <b>Email</b>
-        <p>{{ writer.user.email }}</p>
+        <p><a href="mailto:{{ writer.user.email }}">{{ writer.user.email }}</a></p>
     {% endif %}
+
+    {% if writer.website_url or writer.linkedin_url %}
+        <p><strong>Social Media</strong></p>
+        <ul>
+            {% if writer.website_url %}
+                <li><a href="{{ writer.website_url }}" target="_blank">Website</a></li>
+            {% endif %}
+
+            {% if writer.linkedin_url %}
+                <li><a href="{{ writer.linkedin_url }}" target="_blank">LinkedIn</a></li>
+            {% endif %}
+        </ul>
+    {% endif%}
 {% endblock %}
 
 {% block content %}
 
-    {% if request.user == user %}
+    {% if request.user == writer.user %}
         <a href="{% url 'drafts' %}">Drafts</a>
         <a href="{% url 'new-article' %}">New Article</a>
         <!-- For filtering articles -->

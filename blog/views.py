@@ -166,7 +166,7 @@ class MyArticleListView(LoginRequiredMixin, ListView):
     context_object_name = 'my_articles'
 
     def get_queryset(self):
-        """Returns public and unlisted article of logge in writer."""
+        """Returns public and unlisted article of logged in writer."""
 
         return Article.objects.filter(writer=self.request.user.writer).exclude(article_status='d')
 
@@ -200,6 +200,8 @@ def article_filter(request):
 
     context = {
         'my_articles': articles,
+        'article_status': article_status,
+        'writer': writer,
     }
 
     return render(request, 'blog/writer_articles.html', context)
@@ -209,7 +211,7 @@ class WriterCreateView(LoginRequiredMixin, CreateView):
     """View for creating writer profile."""
 
     model = Writer
-    fields = ['profile_picture', 'first_name', 'last_name', 'bio', 'display_email']
+    fields = ['profile_picture', 'first_name', 'last_name', 'bio', 'website_url', 'linkedin_url', 'display_email']
     success_url = ''
 
     def form_valid(self, form):
@@ -222,7 +224,7 @@ class WriterUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """View for updating user details."""
     
     model = Writer
-    fields = ['profile_picture', 'first_name', 'last_name', 'bio', 'display_email']
+    fields = ['profile_picture', 'first_name', 'last_name', 'bio', 'website_url', 'linkedin_url', 'display_email']
     slug_url_kwarg = 'username'
 
     def get_object(self, queryset=None):
@@ -254,7 +256,6 @@ class WriterUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         """
         
         return redirect(reverse_lazy('writer', kwargs={'username':self.kwargs['username']}))
-
 
 
 class WriterDetailView(DetailView):
