@@ -13,7 +13,7 @@ urlpatterns = [
     path('@<str:username>/<slug:article_url>/update/', views.ArticleUpdateView.as_view(), name='update-article'),
     path('@<str:username>/<slug:article_url>/delete/', views.ArticleDeleteView.as_view(), name='delete-article'),
     path('me/articles/', views.MyArticleListView.as_view(), name='my-articles'),
-    path('me/articles/filter/', views.article_filter, name='filter'),
+    path('me/articles/filter', views.article_filter, name='filter'),
     path('me/drafts/', views.ArticleDraftListView.as_view(), name='drafts'),
     path('writer/create/', views.WriterCreateView.as_view(), name='new-writer'),
 ]

@@ -12,6 +12,9 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
 from uuid import uuid4
+import pyttsx3
+from tempfile import NamedTemporaryFile
+import os
 
 
 def home(request):
@@ -92,14 +95,35 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
     fields = ['article_img', 'title', 'text', 'article_status']
 
     def form_valid(self, form):
-        """Assigns article to current user and use article title to create url path."""
+        """
+        - Assigns article to current user
+        - Use article's title and uuid to create url path of article.
+        - Create article audio using pyttsx3 module
+        """
 
-        article_writer = Writer.objects.filter(user=self.request.user)[0]
-        form.instance.writer = article_writer
+        # Assigns the writer field to the current user.
+        user_name = self.request.user
+        # user_id = User.objects.filter(username=username).values()[0]['id']
+        # article_writer = Writer.objects.filter(user=user_id)[0]
+        form.instance.writer = user_name.writer
 
         # Adding random hash the end of article title to make url unique.
         random_slug = str(uuid4())[:8]
-        form.instance.article_url = slugify(form.instance.title + ' ' + random_slug)
+        article_url_path = form.instance.title + ' ' + random_slug
+        form.instance.article_url = slugify(article_url_path)
+
+        # Saving article audio
+        title_and_text = form.instance.title + '\n' + form.instance.text
+        audio_name = str(user_name) + '_' + form.instance.article_url + '.mp3'
+
+        engine = pyttsx3.init()
+        engine.setProperty('rate', 150)
+        engine.save_to_file(title_and_text, 'temp_audio.mp3')
+        engine.runAndWait()
+
+        form.instance.article_audio.save(audio_name, open('temp_audio.mp3', 'rb'))
+
+        os.remove('temp_audio.mp3')
 
         return super().form_valid(form)
 
@@ -129,6 +153,34 @@ class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         """
         
         return redirect(reverse_lazy('article-detail', kwargs={'article_url':str(self.kwargs['article_url']), 'username':str(self.kwargs['username'])}))
+    
+    def form_valid(self, form):
+        """Update article audio file."""
+        
+        # Delete former audio of updated article
+        if form.instance.article_audio:
+            form.instance.article_audio.delete()
+
+        username = str(self.request.user)
+        article_url = self.kwargs['article_url']
+
+        # Title and text to be converted to speech.
+        title_and_text = form.instance.title + '\n' + form.instance.text
+        audio_name = username + '_' + article_url + '.mp3'
+
+        # Text to speech
+        engine = pyttsx3.init()
+        engine.setProperty('rate', 150)
+        engine.save_to_file(title_and_text, 'temp_audio.mp3')
+        engine.runAndWait()
+
+        # Save audio file to article.article_audio field
+        form.instance.article_audio.save(audio_name, open('temp_audio.mp3', 'rb'))
+
+        # Remove unneeded file created by engine.save_to_file
+        os.remove('temp_audio.mp3')
+
+        return super().form_valid(form)
 
     def get_object(self, queryset=None):
         """Function to assign article_url of the Article model to the url kwarg."""
@@ -212,7 +264,7 @@ class WriterCreateView(LoginRequiredMixin, CreateView):
 
     model = Writer
     fields = ['profile_picture', 'first_name', 'last_name', 'bio', 'website_url', 'linkedin_url', 'display_email']
-    success_url = ''
+    success_url = ''  # TODO: Change the success_url
 
     def form_valid(self, form):
         """Assigns writer's detail to current user."""

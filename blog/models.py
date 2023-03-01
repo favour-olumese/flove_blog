@@ -48,6 +48,7 @@ class Article(models.Model):
     update_date = models.DateTimeField(auto_now=True)
     article_status = models.CharField(max_length=1, choices=ARTICLE_STATUS, default='d')
     article_url = models.CharField(max_length=120)
+    article_audio = models.FileField(upload_to='article_audio/')
     # article_tag = models.CharField(max_length=100)
 
 
