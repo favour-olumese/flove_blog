@@ -18,9 +18,9 @@
                 <source src="{{ article.article_audio.url }}" type="audio/mpeg">
             </audio>
         {% endif %}
+        <small>Reading time: {{ article_time }}</small>
 
         <h3>{{ article.title }}</h3>
         <p>{{ article.text|linebreaks }}</p>
     {% endif%}
-
 {% endblock %}

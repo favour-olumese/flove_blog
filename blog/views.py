@@ -25,6 +25,9 @@ import pyttsx3
 from tempfile import NamedTemporaryFile
 import os
 
+# For calculating how long it would take to read an article
+import time
+
 
 def home(request):
     """Blog home page."""
@@ -95,6 +98,22 @@ class ArticleDetailView(DetailView):
         user_name = self.kwargs.get(self.slug_url_kwarg2)
 
         return get_object_or_404(self.model, article_url=article_url)
+
+    def get_context_data(self, **kwargs):
+        """Function article time to template."""
+        
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+
+        # Get article text
+        article_text = Article.objects.filter(article_url=self.kwargs['article_url']).values()[0]['text']
+        word_num = len(article_text.split())
+        word_secs = (word_num / 200) * 60  # 200 words per minutes
+
+        article_time = time.strftime('%M mins %S secs', time.gmtime(word_secs))
+        context['article_time'] = article_time
+
+        return context
 
 
 class ArticleCreateView(LoginRequiredMixin, CreateView):
