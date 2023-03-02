@@ -5,12 +5,16 @@
 {% endblock %}
 
 {% block content %}
+    <!-- Make drafts only accessible to owner -->
     {% if article.article_status == 'd' and request.user != article.writer.user %}
         <p>Not accessible</p>
     {% else %}
+        {% if article.article_img %}
+            <img src="{{ article.article_img.url }}" alt="" style="width: 600px;">
+        {% endif %}
         <!-- Article audio -->
         {% if article.article_audio %}
-            <audio controls controlsList="nodownload">
+            <audio controls controlsList="nodownload" style="width: 250px; display: block;">
                 <source src="{{ article.article_audio.url }}" type="audio/mpeg">
             </audio>
         {% endif %}
