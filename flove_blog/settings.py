@@ -45,7 +45,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # For sending of verification email after creation of an account.
     'django_email_verification',
+    # For cleaning up media files when associated Model fields are deleted.
+    'django_cleanup.apps.CleanupConfig', 
 ]
 
 MIDDLEWARE = [

@@ -1,17 +1,26 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import UserRegistrationForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
-from django_email_verification import send_email
 from django.views.generic import ListView, DetailView
-from blog.models import Article, Writer
-from django.contrib.auth.mixins import LoginRequiredMixin,  UserPassesTestMixin
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+
+# Models
+from blog.models import Article, Writer
+
+# Makea login a requirement
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
+
+# For user to create account and email verification to be done.
+from .forms import UserRegistrationForm
+from django_email_verification import send_email
+
+# For creation of artcile's url
 from django.utils.text import slugify
 from uuid import uuid4
+
+# For handling of text to speech for article audio.
 import pyttsx3
 from tempfile import NamedTemporaryFile
 import os
