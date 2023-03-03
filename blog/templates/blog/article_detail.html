@@ -8,19 +8,30 @@
     <!-- Make drafts only accessible to owner -->
     {% if article.article_status == 'd' and request.user != article.writer.user %}
         <p>Not accessible</p>
+
     {% else %}
+        <h2>{{ article.title }}</h2>
+
         {% if article.article_img %}
             <img src="{{ article.article_img.url }}" alt="" style="width: 600px;">
         {% endif %}
+
         <!-- Article audio -->
         {% if article.article_audio %}
-            <audio controls controlsList="nodownload" style="width: 250px; display: block;">
+            <audio controls controlsList="nodownload" style="width: 230px; height: 30px; display: block; left: 100px;">
                 <source src="{{ article.article_audio.url }}" type="audio/mpeg">
             </audio>
         {% endif %}
         <small>Reading time: {{ article_time }}</small>
 
-        <h3>{{ article.title }}</h3>
         <p>{{ article.text|linebreaks }}</p>
+        
+        <!-- More  Articles by Author -->
+        <h4>More Articles by {{ article.writer }}</h4>
+        <ul>
+        {% for article in more_article %}
+            <li><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></li>
+        {% endfor %}
+        </ul>
     {% endif%}
 {% endblock %}

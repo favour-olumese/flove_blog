@@ -100,18 +100,32 @@ class ArticleDetailView(DetailView):
         return get_object_or_404(self.model, article_url=article_url)
 
     def get_context_data(self, **kwargs):
-        """Function article time to template."""
+        """Function to:
+        - Add article reading time to template.
+        - Add other article of the writer for reader to read.
+        """
         
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
 
-        # Get article text
-        article_text = Article.objects.filter(article_url=self.kwargs['article_url']).values()[0]['text']
-        word_num = len(article_text.split())
+        # Get article text and title
+        article_url = self.kwargs['article_url']
+        article_text = Article.objects.filter(article_url=article_url).values()[0]['text']
+        article_title = Article.objects.filter(article_url=article_url).values()[0]['title']
+
+        word_num = len(article_text.split() + article_title.split()) 
         word_secs = (word_num / 200) * 60  # 200 words per minutes
 
         article_time = time.strftime('%M mins %S secs', time.gmtime(word_secs))
         context['article_time'] = article_time
+
+        # More articles by same writer for readers to read
+        writer_username = self.kwargs['username']
+        user_id = User.objects.filter(username=writer_username).values()[0]['id']
+        writer  = Writer.objects.get(user=user_id)
+
+        more_article = Article.objects.filter(writer=writer).exclude(article_url=article_url)[:3]
+        context['more_article'] = more_article
 
         return context
 
