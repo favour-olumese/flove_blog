@@ -11,10 +11,10 @@ class Writer(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     profile_picture = models.ImageField(upload_to='img/user_img/', null=True, blank=True)
-    bio = models.TextField(null= True, blank=True)
+    bio = models.TextField(null=True, blank=True)
     display_email = models.BooleanField(default=False)
-    website_url = models.URLField(null= True, blank=True)
-    linkedin_url = models.URLField(null= True, blank=True)
+    website_url = models.URLField(null=True, blank=True)
+    linkedin_url = models.URLField(null=True, blank=True)
 
     class Meta:
         ordering = ['last_name', 'first_name']
@@ -67,4 +67,43 @@ class Article(models.Model):
 
 
 class Comment(models.Model):
-    pass
+    """Class containing comments of writers."""
+
+    text = models.TextField()
+    commenter = models.ForeignKey(Writer, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """String name"""
+
+        return f'{self.commenter} comment in {self.article}'
+
+
+# class Reply(models.Model):
+#     """Class containing reply to comments of writers."""
+
+#     text = models.TextField()
+#     replier = models.ForeignKey(Writer, on_delete=models.CASCADE)
+#     article = models.ForeignKey(Article, on_delete=models.CASCADE)
+#     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+#     date = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         """String name"""
+
+#         return f'{self.commenter} comment in {self.article}' 
+
+class Reply(models.Model):
+    """Class containing comments of writers."""
+
+    reply_text = models.TextField()
+    replier = models.ForeignKey(Writer, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """String name"""
+
+        return f'{self.replier} replied {self.comment}'

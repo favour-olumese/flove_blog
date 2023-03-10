@@ -6,7 +6,7 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 # Models
-from blog.models import Article, Writer
+from blog.models import Article, Writer, Comment, Reply
 
 # Makea login a requirement
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -380,3 +380,61 @@ class WriterDetailView(DetailView):
         user_id = User.objects.filter(username=username).values()[0]['id']
 
         return get_object_or_404(self.model, user=user_id)
+
+
+# class CommentCreateView(LoginRequiredMixin, CreateView):
+#     """View for creating comments."""
+
+#     model = Comment
+#     fields = ['text']
+#     context_object_name = 'comment_form'
+#     template_name = 'blog/article_comment_form.html'
+
+#     def form_valid(self, form):
+#         form.instance.commenter = self.request.user
+#         # TODO: Link article to comment
+
+#         return super().form_valid(form)
+
+
+def comment(request, username, article_url):
+
+    if request.method == 'POST':
+        article_id = request.POST['article_id']
+        article = Article.objects.filter(id=article_id)[0]
+
+        comment = request.POST['comment']
+        commenter = request.user.writer
+
+        Comment.objects.create(
+            text=comment,
+            commenter=commenter,
+            article=article,
+        )
+
+    return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))
+
+
+def reply(request, username, article_url):
+
+    if request.method == 'POST':
+        # Related Article
+        article_id = request.POST['article_id']
+        article = Article.objects.filter(id=article_id)[0]
+
+        # Related Comment
+        comment_id = request.POST['comment_id']
+        comment_query = Comment.objects.filter(id=comment_id)[0]
+
+        # Writer's comment
+        comment = request.POST['comment']
+        commenter = request.user.writer
+
+        Reply.objects.create(
+            reply_text=comment,
+            replier=commenter,
+            article=article,
+            comment=comment_query,
+        )
+
+    return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))

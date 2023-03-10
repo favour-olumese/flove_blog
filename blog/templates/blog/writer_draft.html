@@ -1,8 +1,10 @@
 {% extends 'blog/base.html' %}
 
 {% block title %}
-    <title>My Drafts</title>
+    <title>My Drafts | Flove</title>
 {% endblock %}
+
+{% block content %}
 
 {% for article in article_list %}
     <div style="border-style: solid;">
@@ -15,7 +17,8 @@
         <a href="{% url 'update-article' article.writer.user article.article_url %}">Update</a>
         <a href="{% url 'delete-article' article.writer.user article.article_url %}">Delete</a>
     </div>
-
 {% empty %}
-    <p>There are no articles</p>
+    <p>There are no articles.</p>
 {% endfor %}
+
+{% endblock %}
