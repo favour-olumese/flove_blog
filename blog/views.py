@@ -8,7 +8,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 # Models
 from blog.models import Article, Writer, Comment, Reply
 
-# Makea login a requirement
+# Make login a requirement
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 
@@ -28,6 +28,11 @@ import os
 # For calculating how long it would take to read an article
 import time
 
+# Forms for comment and reply
+from blog.forms import CommentForm, ReplyForm
+
+# For displaying error message for comments and replies
+from django.contrib import messages
 
 def home(request):
     """Blog home page."""
@@ -382,59 +387,65 @@ class WriterDetailView(DetailView):
         return get_object_or_404(self.model, user=user_id)
 
 
-# class CommentCreateView(LoginRequiredMixin, CreateView):
-#     """View for creating comments."""
-
-#     model = Comment
-#     fields = ['text']
-#     context_object_name = 'comment_form'
-#     template_name = 'blog/article_comment_form.html'
-
-#     def form_valid(self, form):
-#         form.instance.commenter = self.request.user
-#         # TODO: Link article to comment
-
-#         return super().form_valid(form)
-
-
+@login_required()
 def comment(request, username, article_url):
 
     if request.method == 'POST':
-        article_id = request.POST['article_id']
-        article = Article.objects.filter(id=article_id)[0]
+        
+        form = CommentForm(request.POST)
 
-        comment = request.POST['comment']
-        commenter = request.user.writer
+        if form.is_valid():
+            form.save(commit=False)
+            comment_text = form.cleaned_data['text']
+            article_id = request.POST['article_id']
+            article = Article.objects.filter(id=article_id)[0]
 
-        Comment.objects.create(
-            text=comment,
-            commenter=commenter,
-            article=article,
-        )
+            commenter = request.user.writer
+            
+            Comment.objects.create(
+                text=comment_text,
+                commenter=commenter,
+                article=article,
+            )
+
+        # Using the message field to display errors
+        else:
+            messages.error(request, 'Text field required.')
 
     return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))
 
 
+@login_required()
 def reply(request, username, article_url):
 
     if request.method == 'POST':
-        # Related Article
-        article_id = request.POST['article_id']
-        article = Article.objects.filter(id=article_id)[0]
 
-        # Related Comment
-        comment_id = request.POST['comment_id']
-        comment_query = Comment.objects.filter(id=comment_id)[0]
+        form = ReplyForm(request.POST) # binding the reply text to the form
 
-        # Writer's comment
-        comment = request.POST['comment']
-        commenter = request.user.writer
+        if form.is_valid():
+            form.save(commit=False)
+            reply_text = form.cleaned_data['reply_text']
 
-        Reply.objects.create(
-            reply_text=comment,
-            replier=commenter,
-            article=article,
-            comment=comment_query,
-        )
+            # Related Article
+            article_id = request.POST['article_id']
+            article = Article.objects.filter(id=article_id)[0]
+
+            # Related Comment
+            comment_id = request.POST['comment_id']
+            comment_query = Comment.objects.filter(id=comment_id)[0]
+
+            # Replier
+            replier = request.user.writer
+
+            Reply.objects.create(
+                reply_text=reply_text,
+                replier=replier,
+                article=article,
+                comment=comment_query,
+            )
+
+        # Using the message field to display errors
+        else:
+            messages.error(request, 'Text field required.')
 
     return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))

@@ -22,58 +22,72 @@
                 <source src="{{ article.article_audio.url }}" type="audio/mpeg">
             </audio>
         {% endif %}
-        <small>Reading time: {{ article_time }}</small>
-
-        <p>{{ article.text|linebreaks }}</p>
-
-        <form action="{% url 'article-comments' article.writer.user article.article_url %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="article_id" value="{{ article.id }}">
-            <textarea name="comment" cols="30" rows="10"></textarea><br>
-            <input type="submit" value="Comment">
-        </form>
-
-        <!-- Comments -->
-        <ul>
-        {% for comment in article.comment_set.all %}
-
-            <li>
-                <div>
-                    <small style="font-size: 10px;">{{ comment.commenter }} - {{ comment.date }}</small><br>
-                    <small>{{comment.text}}</small>
-
-                    <!-- Comment replies -->
-                    {% if comment.reply_set.all %}
-                    <br><small>Replies</small>
-                        <ul>
-                            {% for reply in comment.reply_set.all %}
-                            <li>
-                                <small style="font-size: 10px;">{{ reply.replier }} - {{ reply.date }}</small><br>
-                                <small>{{ reply.reply_text }}</small>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    <br>
-                    <!-- Replies to comments form -->
-                    <ul>
-                    <div>
-                        <form action="{% url 'article-comments-replies' article.writer.user article.article_url %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="article_id" value="{{ article.id }}">
-                            <input type="hidden" name="comment_id" value="{{ comment.id }}">
-
-                            <textarea name="comment" style="width: 100px; height: 30px;"></textarea><br>
-                            <input type="submit" value="Reply" style="width: 45px; height: 17px;font-size: 11px;">
-                        </form>
-                    </div>
-                </ul>
-                </div>
         
-            </li>
+        <!-- Article Time -->
+        <small>Reading time: {{ article_time }}</small>
+        
+        <!-- Articles text -->
+        <p>{{ article.text|linebreaks }}</p>
+        
+        <div>
+            <h4>Comments</h4>
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
 
-        {% endfor %}
-        </ul>
+            <form action="{% url 'article-comments' article.writer.user article.article_url %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="article_id" value="{{ article.id }}">
+                <input type="hidden" name="commenter" value="{{ request.user.writer }}">
+
+                <textarea name="text" cols="30" rows="5"></textarea><br>
+                <input type="submit" value="Comment">
+            </form>
+
+            <!-- Comments -->
+            {% for comment in article.comment_set.all %}
+            <ul>
+                <li>
+                    <div>
+                        <small style="font-size: 10px;">{{ comment.commenter }} - {{ comment.date }}</small><br>
+                        <small>{{comment.text}}</small>
+
+                        <!-- Comment replies -->
+                        {% if comment.reply_set.all %}
+                        <br><small>Replies</small>
+                            <ul>
+                                {% for reply in comment.reply_set.all %}
+                                <li>
+                                    <small style="font-size: 10px;">{{ reply.replier }} - {{ reply.date }}</small><br>
+                                    <small>{{ reply.reply_text }}</small>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        <br>
+                        <!-- Replies to comments form -->
+                        <ul>
+                        <div>
+                            <form action="{% url 'article-comments-replies' article.writer.user article.article_url %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="article_id" value="{{ article.id }}">
+                                <input type="hidden" name="comment_id" value="{{ comment.id }}">
+
+                                <textarea name="reply_text" style="width: 100px; height: 30px;"></textarea><br>
+                                <input type="submit" value="Reply" style="width: 45px; height: 17px;font-size: 11px;">
+                            </form>
+                        </div>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            {% endfor %}
+            </div>
+        
         <!-- More  Articles by Author -->
         {% if more_articles %}
             <h4>More Articles by {{ article.writer }}</h4>
@@ -85,7 +99,7 @@
         {% endif %}
     {% endif%}
 {% endblock %}
-<!-- TODO: Work on form.is_valid to catch empty form
-Create a drop down for hiding comments and replies
-make use of is_authenticated to prevent anonymous user from making comments
+<!-- TODO:
+- Create a drop down for hiding comments and replies
+- Toggle form on for replies and off with cancel.
 GREAT JOB -->

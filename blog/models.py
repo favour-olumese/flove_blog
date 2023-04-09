@@ -100,7 +100,7 @@ class Reply(models.Model):
     reply_text = models.TextField()
     replier = models.ForeignKey(Writer, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)  # Comment replied to
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
