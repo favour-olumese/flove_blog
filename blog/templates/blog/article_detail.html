@@ -1,4 +1,5 @@
 {% extends 'blog/base.html' %}
+{% load static %}
 
 {% block title %}
     <title>{{ article.title }} | Flove</title>
@@ -31,6 +32,8 @@
         
         <div>
             <h4>Comments</h4>
+
+            <!-- For error message in filling of form. -->
             {% if messages %}
                 <ul class="messages">
                     {% for message in messages %}
@@ -39,6 +42,7 @@
                 </ul>
             {% endif %}
 
+            <!-- Form for comments. -->
             <form action="{% url 'article-comments' article.writer.user article.article_url %}" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="article_id" value="{{ article.id }}">
@@ -56,6 +60,21 @@
                         <small style="font-size: 10px;">{{ comment.commenter }} - {{ comment.date }}</small><br>
                         <small>{{comment.text}}</small>
 
+                        <!-- Replies to comments form. -->
+                        <br>
+                        <button id="show" onclick="show_reply_box()">Reply</button>
+                        
+                        <form class="reply-box" action="{% url 'article-comments-replies' article.writer.user article.article_url %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="article_id" value="{{ article.id }}">
+                            <input type="hidden" name="comment_id" value="{{ comment.id }}">
+
+                            <textarea name="reply_text" style="width: 100px; height: 30px;"></textarea><br>
+                            <input type="submit" value="Reply" style="width: 45px; height: 15px;font-size: 9px;">
+                        </form>
+                        <button id="cancel-reply" onclick="hide_reply_box()">Cancel</button>
+
+
                         <!-- Comment replies -->
                         {% if comment.reply_set.all %}
                         <br><small>Replies</small>
@@ -69,19 +88,6 @@
                             </ul>
                         {% endif %}
                         <br>
-                        <!-- Replies to comments form -->
-                        <ul>
-                        <div>
-                            <form action="{% url 'article-comments-replies' article.writer.user article.article_url %}" method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="article_id" value="{{ article.id }}">
-                                <input type="hidden" name="comment_id" value="{{ comment.id }}">
-
-                                <textarea name="reply_text" style="width: 100px; height: 30px;"></textarea><br>
-                                <input type="submit" value="Reply" style="width: 45px; height: 17px;font-size: 11px;">
-                            </form>
-                        </div>
-                        </ul>
                     </div>
                 </li>
             </ul>
@@ -98,6 +104,8 @@
             </ul>
         {% endif %}
     {% endif%}
+
+    <script src="{% static 'js/index.js'%}"></script>
 {% endblock %}
 <!-- TODO:
 - Create a drop down for hiding comments and replies
