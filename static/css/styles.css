@@ -1,3 +1,9 @@
+/* Hide reply box, would be activated using JavaScript */
 .reply-box {
+    display: none;
+}
+
+/* Hide button for hiding reply textarea until textarea is displayed using JavaScript */
+#cancel-reply{
     display: none;
 }
