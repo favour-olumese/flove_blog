@@ -1,9 +1,26 @@
+/* Glabal */
+li {
+    list-style: none;
+}
+
 /* Hide reply box, would be activated using JavaScript */
 .reply-box {
     display: none;
 }
 
 /* Hide button for hiding reply textarea until textarea is displayed using JavaScript */
-#cancel-reply{
+#cancel-reply {
     display: none;
+}
+
+/* Hide comments  and button for hiding comments when page is loaded */
+#comment-area, #hide-comments {
+    display: none;
+}
+
+/* Buttons for hiding and showing  comments */
+#show-reply-box, #cancel-reply {
+    text-decoration: none;
+    font-size: 12px;
+    color: rgb(253, 8, 0);
 }

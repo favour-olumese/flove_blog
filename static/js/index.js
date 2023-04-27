@@ -1,13 +1,15 @@
+// Hide and Unhide Article Reply Box
+
 var form = document.getElementsByClassName('reply-box');
-let btnShow= document.querySelectorAll('#show')
-let hideForm=document.querySelectorAll('#cancel-reply')
+let btnShow = document.querySelectorAll('#show-reply-box')
+let hideForm = document.querySelectorAll('#cancel-reply')
 
 btnShow.forEach((ele,i)=>{
     ele.addEventListener("click",  ()=> {     
         // form[i].style.height="60px"
         form[i].style.display="block"
         btnShow[i].style.display="none"
-        hideForm[i].style.display="block"
+        hideForm[i].style.display="inline"
     })
 })
 hideForm.forEach((ele,i)=>{
@@ -18,7 +20,19 @@ hideForm.forEach((ele,i)=>{
     })
 })
 
+// Show and Hide Comments
 
+function show_comments() {
+    document.getElementById('comment-area').style.display="block";
+    document.getElementById('hide-comments').style.display="block";
+    document.getElementById('show-comments').style.display="none";
+}
+
+function hide_comments() {
+    document.getElementById('comment-area').style.display="none";
+    document.getElementById('show-comments').style.display="block";
+    document.getElementById('hide-comments').style.display="none";
+}
   
     // ,
 

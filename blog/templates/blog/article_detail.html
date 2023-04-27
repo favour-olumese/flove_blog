@@ -53,47 +53,54 @@
             </form>
 
             <!-- Comments -->
-            {% for comment in article.comment_set.all %}
-            <ul>
-                <li>
-                    <div>
-                        <small style="font-size: 10px;">{{ comment.commenter }} - {{ comment.date }}</small><br>
-                        <small>{{comment.text}}</small>
+            {% if article.comment_set.all %}
+            <a href="" onclick="show_comments(); return false" id="show-comments">Open comments</a>
+            <div id="comment-area">
+                {% for comment in article.comment_set.all %}
+                <ul>
+                    <li>
+                        <div>
+                            <small style="font-size: 10px;">{{ comment.commenter }} - {{ comment.date }}</small><br>
+                            <small>{{comment.text}}</small>
 
-                        <!-- Replies to comments form. -->
-                        <br>
-                        <button id="show"
-                         >Reply</button>
-                        
-                        <form class="reply-box" action="{% url 'article-comments-replies' article.writer.user article.article_url %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="article_id" value="{{ article.id }}">
-                            <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                            <!-- Replies to comments form. -->
+                            <br>
+                            <!-- <button id="show">Reply</button> -->
+                            <a href="" id="show-reply-box" onclick="return false;">Reply</a>
+                            
+                            <form class="reply-box" action="{% url 'article-comments-replies' article.writer.user article.article_url %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="article_id" value="{{ article.id }}">
+                                <input type="hidden" name="comment_id" value="{{ comment.id }}">
 
-                            <textarea name="reply_text" style="width: 100px; height: 30px;"></textarea><br>
-                            <input type="submit" value="Reply" style="width: 45px; height: 15px;font-size: 9px; display: inline;">
-                        </form>
-                        <button id="cancel-reply">Cancel</button>
+                                <textarea name="reply_text" style="width: 100px; height: 30px;"></textarea><br>
+                                <input type="submit" value="Reply" style="width: 45px; height: 15px;font-size: 9px; display: inline;">
+                            </form>
+                            <!-- <button id="cancel-reply">Cancel</button> -->
+                            <a href="" id="cancel-reply" onclick="return false">Cancel</a>
 
 
-                        <!-- Comment replies -->
-                        {% if comment.reply_set.all %}
-                        <br><small>Replies</small>
-                            <ul>
-                                {% for reply in comment.reply_set.all %}
-                                <li>
-                                    <small style="font-size: 10px;">{{ reply.replier }} - {{ reply.date }}</small><br>
-                                    <small>{{ reply.reply_text }}</small>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                        <br>
-                    </div>
-                </li>
-            </ul>
-            {% endfor %}
+                            <!-- Comment replies -->
+                            {% if comment.reply_set.all %}
+                            <br><small>Replies</small>
+                                <ul>
+                                    {% for reply in comment.reply_set.all %}
+                                    <li>
+                                        <small style="font-size: 10px;">{{ reply.replier }} - {{ reply.date }}</small><br>
+                                        <small>{{ reply.reply_text }}</small>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                            <br>
+                        </div>
+                    </li>
+                </ul>
+                {% endfor %}
             </div>
+            <a href="" onclick="hide_comments(); return false" id="hide-comments">Close comments</a>
+            {% endif %}
+        </div>
         
         <!-- More  Articles by Author -->
         {% if more_articles %}
@@ -109,6 +116,7 @@
     <script src="{% static 'js/index.js'%}"></script>
 {% endblock %}
 <!-- TODO:
-- Create a drop down for hiding comments and replies
-- Toggle form on for replies and off with cancel.
+- CONSIDER USING POSTGRESQL INSTEAD OF SQLITE3 FOR THE DATABASE
+- TRY TO ENSURE THE READING  TIME MINUTES DON'T SHOW IF THE ARTICLE IS LESS THAN A MIN
+-  LOOK FOR A WAY TO DELETE PREVIOUS AUDIO  WHEN AN ARTICLE HAS BEEN UPDATED
 GREAT JOB -->
