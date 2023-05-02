@@ -1,7 +1,17 @@
 {% extends 'blog/base.html' %}
 
 {% block title %}
-    <title>New Article | Flove</title>
+    <title>
+        {% if article %}
+            {# Title of article to be updates #}
+            Updating {{ article.title }} | Flove
+        {% else %}
+            {# Title for new article #}
+            New Article | Flove
+        {% endif %}
+    </title>
+        
+        
 {% endblock %}
 
 {% block content %}
