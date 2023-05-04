@@ -121,7 +121,11 @@ class ArticleDetailView(DetailView):
         word_num = len(article_text.split() + article_title.split()) 
         word_secs = (word_num / 200) * 60  # 200 words per minutes
 
-        article_time = time.strftime('%M mins %S secs', time.gmtime(word_secs))
+        if word_secs < 60:
+            article_time  = 'Less than a minute'
+        else:
+            article_time = time.strftime('%M mins %S secs', time.gmtime(word_secs))
+
         context['article_time'] = article_time
 
         # More articles by same writer for readers to read
