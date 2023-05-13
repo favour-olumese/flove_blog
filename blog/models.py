@@ -35,10 +35,16 @@ class Article(models.Model):
 
     # Choices to make articles either draft, public, or unlisted.
     ARTICLE_STATUS = (
-    ('d', 'Draft'),
-    ('p', 'Public'),
-    ('u', 'Unlisted'),
-)
+        ('d', 'Draft'),
+        ('p', 'Public'),
+        ('u', 'Unlisted'),
+    )
+
+    # Choices for writer to have article audio displayed on article detail page.
+    DISPLAY_AUDIO = (
+        ('y', 'Yes'),
+        ('n', 'No'),
+    )
 
     writer = models.ForeignKey(Writer, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
@@ -49,6 +55,7 @@ class Article(models.Model):
     article_status = models.CharField(max_length=1, choices=ARTICLE_STATUS, default='d')
     article_url = models.CharField(max_length=120)
     article_audio = models.FileField(upload_to='article_audio/')
+    display_audio = models.CharField(max_length=1, choices=DISPLAY_AUDIO)
     # article_tag = models.CharField(max_length=100)
 
 

@@ -118,6 +118,7 @@ class ArticleDetailView(DetailView):
         article_text = Article.objects.filter(article_url=article_url).values()[0]['text']
         article_title = Article.objects.filter(article_url=article_url).values()[0]['title']
 
+        # Article reading time
         word_num = len(article_text.split() + article_title.split()) 
         word_secs = (word_num / 200) * 60  # 200 words per minutes
 
@@ -143,7 +144,7 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
     """View for creating new articles."""
 
     model = Article
-    fields = ['article_img', 'title', 'text', 'article_status']
+    fields = ['article_img', 'title', 'text', 'article_status', 'display_audio']
 
     def form_valid(self, form):
         """
@@ -154,8 +155,6 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
 
         # Assigns the writer field to the current user.
         user_name = self.request.user
-        # user_id = User.objects.filter(username=username).values()[0]['id']
-        # article_writer = Writer.objects.filter(user=user_id)[0]
         form.instance.writer = user_name.writer
 
         # Adding random hash the end of article title to make url unique.
@@ -174,6 +173,7 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
 
         form.instance.article_audio.save(audio_name, open('temp_audio.mp3', 'rb'))
 
+        # Delete temporary audio after saving file to audio FileField
         os.remove('temp_audio.mp3')
 
         return super().form_valid(form)
@@ -183,7 +183,7 @@ class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """View for updating articles."""
 
     model = Article
-    fields = ['article_img', 'title', 'text', 'article_status']
+    fields = ['article_img', 'title', 'text', 'article_status', 'display_audio']
     slug_url_kwarg = 'article_url'
     slug_url_kwarg2 = 'username'
 

@@ -19,7 +19,7 @@
         {% endif %}
         
         <!--
-            Date article was publisehed or updated.
+            Date article was published or updated.
             If the article has been updated, the updated date would display
             instead of the publication date.
 
@@ -37,7 +37,7 @@
         {% endif %}
 
         <!-- Article audio -->
-        {% if article.article_audio %}
+        {% if article.article_audio and article.display_audio == 'y' %}
             <audio controls controlsList="nodownload" style="width: 230px; height: 30px; display: block; left: 100px;">
                 <source src="{{ article.article_audio.url }}" type="audio/mpeg">
             </audio>
@@ -134,6 +134,7 @@
 
     <script src="{% static 'js/index.js'%}"></script>
 {% endblock %}
-<!-- TODO:
-- TRY TO ENSURE THE READING  TIME MINUTES DON'T SHOW IF THE ARTICLE IS LESS THAN A MIN
-GREAT JOB -->
+
+<!-- 
+TODO: SHOULD THE ARTICLE URL BE CHANGED IF THE ARTICLE NAME IS UPDATED.
+ -->
