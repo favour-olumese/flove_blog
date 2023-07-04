@@ -56,6 +56,7 @@ class Article(models.Model):
     article_url = models.CharField(max_length=120)
     article_audio = models.FileField(upload_to='article_audio/')
     display_audio = models.CharField(max_length=1, choices=DISPLAY_AUDIO)
+    likes = models.ManyToManyField(Writer, related_name='article_likes', blank=True)
     # article_tag = models.CharField(max_length=100)
 
 

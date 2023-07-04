@@ -4,6 +4,7 @@ from django.urls import reverse, reverse_lazy
 from django.contrib.auth.models import User
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.decorators.http import require_POST
 
 # Models
 from blog.models import Article, Writer, Comment, Reply
@@ -309,6 +310,19 @@ def article_filter(request):
 
     return render(request, 'blog/writer_articles.html', context)
 
+
+@login_required
+def article_likes(request, username, article_url):
+
+    if request.method == 'POST':
+        post = get_object_or_404(Article, id=request.POST.get('article_id'))
+
+        if post.likes.filter(id=request.user.writer.id).exists():
+            post.likes.remove(request.user.writer)
+        else:
+            post.likes.add(request.user.writer)
+
+    return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))
 
 class WriterCreateView(LoginRequiredMixin, CreateView):
     """View for creating writer profile."""

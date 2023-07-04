@@ -8,7 +8,7 @@ admin.site.register(Writer)
 
 class ArticleAdmin(admin.ModelAdmin):
     fields = ['writer', 'title', 'text', 'article_img', 'pub_date', 
-    'update_date', 'article_url', 'article_audio', 'article_status']
+    'update_date', 'article_url', 'article_audio', 'article_status', 'likes']
     
     readonly_fields = ['pub_date', 'update_date', 'article_url', 'article_audio']  # For non-editable fields
 

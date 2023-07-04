@@ -13,3 +13,4 @@ pyttsx3==2.90
 pywin32==305
 sqlparse==0.4.3
 tzdata==2022.7
+fontawesomefree==6.4.0

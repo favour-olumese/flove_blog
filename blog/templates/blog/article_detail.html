@@ -49,6 +49,15 @@
         <!-- Articles text -->
         <p>{{ article.text|linebreaks }}</p>
         
+        {% with num_of_likes=article.likes.count %}
+        <span>{{ num_of_likes }} Like{{ num_of_likes|pluralize }}</span>
+        <form action="{% url 'like-article' article.writer.user article.article_url %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="article_id" value="{{ article.id }}">
+
+            <input type="submit" value="Like">
+        </form>
+        {% endwith %}
         <div>
             <h4>Comments</h4>
 
@@ -134,7 +143,3 @@
 
     <script src="{% static 'js/index.js'%}"></script>
 {% endblock %}
-
-<!-- 
-TODO: SHOULD THE ARTICLE URL BE CHANGED IF THE ARTICLE NAME IS UPDATED.
- -->

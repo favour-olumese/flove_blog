@@ -48,7 +48,9 @@ INSTALLED_APPS = [
     # For sending of verification email after creation of an account.
     'django_email_verification',
     # For cleaning up media files when associated Model fields are deleted.
-    'django_cleanup.apps.CleanupConfig', 
+    'django_cleanup.apps.CleanupConfig',
+    # Font Awesome Fonts
+    'fontawesomefree',
 ]
 
 MIDDLEWARE = [
