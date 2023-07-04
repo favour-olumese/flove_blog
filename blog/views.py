@@ -4,7 +4,6 @@ from django.urls import reverse, reverse_lazy
 from django.contrib.auth.models import User
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.decorators.http import require_POST
 
 # Models
 from blog.models import Article, Writer, Comment, Reply
@@ -17,7 +16,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm
 from django_email_verification import send_email
 
-# For creation of artcile's url
+# For creation of article's url
 from django.utils.text import slugify
 from uuid import uuid4
 
@@ -313,16 +312,40 @@ def article_filter(request):
 
 @login_required
 def article_likes(request, username, article_url):
+    """Function for liking articles
+    
+    Writers who likes an article are added to the likes field of the Article model.
+    """
 
     if request.method == 'POST':
-        post = get_object_or_404(Article, id=request.POST.get('article_id'))
+        article = get_object_or_404(Article, id=request.POST.get('article_id'))
 
-        if post.likes.filter(id=request.user.writer.id).exists():
-            post.likes.remove(request.user.writer)
+        if article.likes.filter(id=request.user.writer.id).exists():
+            article.likes.remove(request.user.writer)
         else:
             post.likes.add(request.user.writer)
 
     return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))
+
+
+@login_required
+def save_article(request, username, article_url):
+    """Function for saving of articles by writers.
+    
+    Articles liked by a writer are added to the saved_articles field of the Writer.
+    """
+
+    if request.method == 'POST':
+        article_id = request.POST.get('article_id')
+        writer = request.user.writer
+
+        if writer.saved_articles.filter(id=article_id).exists():
+            writer.saved_articles.remove(article_id)
+        else:
+            writer.saved_articles.add(article_id)
+
+    return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))
+
 
 class WriterCreateView(LoginRequiredMixin, CreateView):
     """View for creating writer profile."""

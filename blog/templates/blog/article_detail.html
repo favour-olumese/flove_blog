@@ -45,10 +45,19 @@
         
         <!-- Article Time -->
         <small>Reading time: {{ article_time }}</small>
-        
+
+        <!-- Save Article -->
+        <form action="{% url 'save-article' article.writer.user article.article_url %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="article_id" value="{{ article.id }}">
+
+            <input type="submit" value="Save">
+        </form>
+
         <!-- Articles text -->
         <p>{{ article.text|linebreaks }}</p>
         
+        <!-- Article Likes -->
         {% with num_of_likes=article.likes.count %}
         <span>{{ num_of_likes }} Like{{ num_of_likes|pluralize }}</span>
         <form action="{% url 'like-article' article.writer.user article.article_url %}" method="post">

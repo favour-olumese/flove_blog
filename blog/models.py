@@ -15,6 +15,7 @@ class Writer(models.Model):
     display_email = models.BooleanField(default=False)
     website_url = models.URLField(null=True, blank=True)
     linkedin_url = models.URLField(null=True, blank=True)
+    saved_articles = models.ManyToManyField("Article", related_name='saved_articles', blank=True)
 
     class Meta:
         ordering = ['last_name', 'first_name']
