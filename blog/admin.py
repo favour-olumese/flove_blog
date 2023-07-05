@@ -11,13 +11,16 @@ class WriterAdmin(admin.ModelAdmin):
     fields = ['user', 'first_name', 'last_name', 'profile_picture',
     'bio', 'display_email', 'website_url', 'linkedin_url', 'saved_articles']
 
-    # def formfield_for_manytomany(self, db_field, request, **kwargs):
-    #     if db_field.name == 'saved_articles':
-    #         kwargs["queryset"] = Article.objects.saved_articles
-    #     return super(Writer, self).formfield_for_manytomany(db_field, request, **kwargs)
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        """Ensure only saved_articles are shown instead of all articles."""
+
+        if db_field.name == 'saved_articles':
+            writer = Writer.objects.get(id=request.user.writer.id)
+            kwargs["queryset"] = writer.saved_articles.all()
+        return super(WriterAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
 
-admin.site.register(Writer)
+admin.site.register(Writer, WriterAdmin)
 
 
 class ArticleAdmin(admin.ModelAdmin):
@@ -28,8 +31,6 @@ class ArticleAdmin(admin.ModelAdmin):
     
     # Non-editable fields
     readonly_fields = ['pub_date', 'update_date', 'article_url', 'article_audio']
-
-
 
 
 admin.site.register(Article, ArticleAdmin)
