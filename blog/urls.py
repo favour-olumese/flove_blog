@@ -1,5 +1,6 @@
 from django.urls import path, include
 from . import views
+from django.contrib.auth.decorators import login_required
 
 # app_name=
 urlpatterns = [
@@ -16,8 +17,7 @@ urlpatterns = [
     path('@<str:username>/<slug:article_url>/delete/', views.ArticleDeleteView.as_view(), name='delete-article'),
     path('@<str:username>/<slug:article_url>/like', views.article_likes, name='like-article'),
     path('@<str:username>/<slug:article_url>/save', views.save_article, name='save-article'),
-    path('me/articles/', views.MyArticleListView.as_view(), name='my-articles'),
     path('me/articles/filter', views.article_filter, name='filter'),
-    path('me/drafts/', views.ArticleDraftListView.as_view(), name='drafts'),
+    path('me/articles/saved', login_required(views.ArticleListView.as_view()), name='saved-articles'),
     path('writer/create/', views.WriterCreateView.as_view(), name='new-writer'),
 ]

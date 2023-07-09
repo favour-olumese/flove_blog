@@ -46,10 +46,11 @@
         <!-- Article Time -->
         <small>Reading time: {{ article_time }}</small>
 
-        <!-- Save Article -->
+        <!-- Save/Unsave Article -->
         <form action="{% url 'save-article' article.writer.user article.article_url %}" method="post">
             {% csrf_token %}
             <input type="hidden" name="article_id" value="{{ article.id }}">
+            <input type="hidden" name="article_path" value="{{ request.path }}">
 
             <input type="submit" value="Save">
         </form>
@@ -63,6 +64,7 @@
         <form action="{% url 'like-article' article.writer.user article.article_url %}" method="post">
             {% csrf_token %}
             <input type="hidden" name="article_id" value="{{ article.id }}">
+            <input type="hidden" name="article_path" value="{{ request.path }}">
 
             <input type="submit" value="Like">
         </form>

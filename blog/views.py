@@ -34,6 +34,7 @@ from blog.forms import CommentForm, ReplyForm
 # For displaying error message for comments and replies
 from django.contrib import messages
 
+
 def home(request):
     """Blog home page."""
 
@@ -86,7 +87,21 @@ def register_user(request):
 class ArticleListView(ListView):
     """List view of all public articles."""
 
+    # model = Article
+    template_name = 'blog/article_list.html'
     queryset = Article.objects.filter(article_status='p')
+
+    def get_queryset(self, **kwargs):
+        queryset = super().get_queryset()
+
+        current_url = self.request.path
+        if current_url == reverse('articles'):
+            queryset = queryset
+        elif current_url == reverse('saved-articles'):
+            # Queryset for saved articles
+            queryset = Writer.objects.get(id=self.request.user.writer.id).saved_articles.all()
+
+        return queryset
 
 
 class ArticleDetailView(DetailView):
@@ -259,35 +274,6 @@ class ArticleDeleteView(LoginRequiredMixin, DeleteView):
         return get_object_or_404(self.model, article_url=article_url)
 
 
-class MyArticleListView(LoginRequiredMixin, ListView):
-    """"List of all public and unlisted articles.
-    
-    Each writer can only access his or her own list.
-    """
-
-    template_name = 'blog/writer_articles.html'
-    context_object_name = 'my_articles'
-
-    def get_queryset(self):
-        """Returns public and unlisted article of logged in writer."""
-
-        return Article.objects.filter(writer=self.request.user.writer).exclude(article_status='d')
-
-
-class ArticleDraftListView(LoginRequiredMixin, ListView):
-    """View for drafts."""
-
-    template_name = 'blog/writer_draft.html'
-
-    def get_queryset(self):
-        """
-        Gets articles of writer that have the draft status.
-        """
-        user = self.request.user.writer
-
-        return Article.objects.filter(writer=user, article_status='d')
-
-
 @login_required
 def article_filter(request):
     """Function for writer to view all published, unlisted, or public articles."""
@@ -297,17 +283,17 @@ def article_filter(request):
 
     # All articles
     if (article_status == 'a'):
-        return HttpResponseRedirect(reverse('my-articles'))
+        return HttpResponseRedirect(reverse('writer', args=(request.user,)))
 
     articles = Article.objects.filter(writer=writer, article_status=article_status)
 
     context = {
-        'my_articles': articles,
+        'article_list': articles,
         'article_status': article_status,
         'writer': writer,
     }
 
-    return render(request, 'blog/writer_articles.html', context)
+    return render(request, 'blog/writer_detail.html', context)
 
 
 @login_required
@@ -317,15 +303,18 @@ def article_likes(request, username, article_url):
     Writers who likes an article are added to the likes field of the Article model.
     """
 
+    request_path = request.POST.get('article_path')
+
     if request.method == 'POST':
         article = get_object_or_404(Article, id=request.POST.get('article_id'))
 
         if article.likes.filter(id=request.user.writer.id).exists():
             article.likes.remove(request.user.writer)
         else:
-            post.likes.add(request.user.writer)
+            article.likes.add(request.user.writer)
 
-    return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))
+    return HttpResponseRedirect(request_path)
+    # return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))
 
 
 @login_required
@@ -334,6 +323,8 @@ def save_article(request, username, article_url):
     
     Articles liked by a writer are added to the saved_articles field of the Writer.
     """
+
+    request_path = request.POST.get('article_path')
 
     if request.method == 'POST':
         article_id = request.POST.get('article_id')
@@ -344,7 +335,7 @@ def save_article(request, username, article_url):
         else:
             writer.saved_articles.add(article_id)
 
-    return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))
+    return HttpResponseRedirect(request_path)
 
 
 class WriterCreateView(LoginRequiredMixin, CreateView):

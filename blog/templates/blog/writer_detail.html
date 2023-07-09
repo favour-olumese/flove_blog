@@ -1,7 +1,22 @@
 {% extends 'blog/base.html' %}
 
 {% block title %}
-    <title>{{ writer }} | Flove</title>
+    <title>
+        {{ writer }} 
+
+        {% if article_status == 'p' %}
+            Public Articles 
+
+        {% elif article_status == 'u' %}
+            Unlisted Articles 
+
+        {% elif article_status == 'd' %}
+            Drafts
+
+        {% endif %}
+
+        | Flove
+    </title>
 {% endblock %}
 
 {% block sidebar %}
@@ -37,14 +52,22 @@
 {% block content %}
 
     {% if request.user == writer.user %}
-        <a href="{% url 'drafts' %}">Drafts</a>
-        <a href="{% url 'new-article' %}">New Article</a>
+        <a href="{% url 'new-article' %}">Write</a>
         <!-- For filtering articles -->
         <form action="{% url 'filter' %}" method="get">
             <select name="article_status" id="filter">
-                <option value="p">Public</option>
-                <option value="u">Unlisted</option>
-                <option value="a">All Published</option>
+                <option value="d" {% if article_status == 'd' %}
+                selected="selected"{% endif %}>Drafts</option>
+
+                <option value="p" {% if article_status == 'p' %}
+                selected="selected"{% endif %}>Public</option>
+
+                <option value="u" {% if article_status == 'u' %}
+                selected="selected"{% endif %}>Unlisted</option>
+
+                <option value="a" {% if article_status == None %}
+                selected="selected"{% endif %}>All Published</option>
+
             </select>
 
             <input type="submit" value="Submit">
@@ -52,6 +75,7 @@
     {% endif %}
 
     {% for article in article_list %}
+
         <!-- Ensures that only user can see unlisted articles -->
         {% if article.article_status == 'u' and request.user.writer != article.writer %}
             <div></div>
@@ -63,6 +87,15 @@
                 </a>
                 <small>{{ article.writer }}</small>
                 <small>{{ article.get_article_status_display }}</small>
+
+                 <!-- Save/Unsave Article -->
+                <form action="{% url 'save-article' article.writer.user article.article_url %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="article_id" value="{{ article.id }}">
+                    <input type="hidden" name="article_path" value="{{ request.path }}">
+
+                    <input type="submit" value="Save">
+                </form>
 
                 {% if request.user == article.writer.user %}
                     <a href="{% url 'update-article' article.writer.user article.article_url %}">Update</a>

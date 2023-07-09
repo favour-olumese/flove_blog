@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block content %}
+{{article_list}}
 {% for article in article_list %}
     <div style="border-style: solid;">
         <a href="{{ article.get_absolute_url }}">
@@ -12,8 +13,18 @@
         </a>
         <small>{{ article.writer }}</small>
         <small>{{ article.get_article_status_display }}</small>
+        <a href="{% url 'new-article' %}">Write</a>
 
-        {% if request.user == article.writer.user %}
+        <!-- Save/Unsave Article -->
+        <form action="{% url 'save-article' article.writer.user article.article_url %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="article_id" value="{{ article.id }}">
+            <input type="hidden" name="article_path" value="{{ request.path }}">
+
+            <input type="submit" value="Save">
+        </form>
+
+        {% if request.user.writer.id == article.writer.id %}
             <a href="{% url 'update-article' article.writer.user article.article_url %}">Update</a>
             <a href="{% url 'delete-article' article.writer.user article.article_url %}">Delete</a>
         {% endif %}
@@ -21,6 +32,8 @@
 
 {% empty %}
     <p>There are no articles</p>
+{{object_list}}
+
 {% endfor %}
 
 {% endblock %}
