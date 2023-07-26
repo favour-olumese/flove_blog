@@ -357,8 +357,19 @@ def save_article(request, username, article_url):
 
         if writer.saved_articles.filter(id=article_id).exists():
             writer.saved_articles.remove(article_id)
+            button_value = 'Save'
         else:
             writer.saved_articles.add(article_id)
+            button_value = 'Unsave'
+
+        status = 200
+
+        context = {
+            'button_value': button_value,
+            'status': status
+        }
+
+        return JsonResponse(context)
 
     return HttpResponseRedirect(article_path)
 

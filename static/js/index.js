@@ -33,39 +33,115 @@ function hide_comments() {
     document.getElementById('show-comments').style.display="block";
     document.getElementById('hide-comments').style.display="none";
 }
-  
-    // ,
 
 
-    // function hide_reply_box() {
-    //     document.getElementsByClassName('reply-box')[i].style.height="0px"
-    //     document.getElementsByClassName('reply-box')[i].style.display="none"
-    //     document.getElementById('show').style.display="block";
-    // }
-    
+// Confirms if user is logged in.
+const userAuthenticated = $('#check-authenticaton').data('check_authentication')
+
+// Redirect forms to login page if user is not authenticated
+var loginPageRedirect = $('#login-page-redirect').data('login_page_redirect')
+
+// Forms action urls
+var likeFormUrl = $('#like-form-url').data('like_form_url')
+var saveFormUrl = $('#save-form-url').data('save_form_url')
 
 
-// console.log(btn)
+// Article like button 
+$(document).on('submit', '#like-form', function(event){
+    /*
+     * Update the number of likes when the like form is submitted
+     */
+    event.preventDefault();
 
-// var btn = document.getElementsByClassName('reply-box');
+    $.ajax({
 
-// console.log(btn);
-// for (var i = 0; i < btn.length; i++) {
-//     console.log(btn[i]).style["height"]="20px";
-// }
+        beforeSend: function() {
+        /*
+         * Users are redirected to login page if there are not logged in. 
+         */
+
+        if (userAuthenticated == false) {
+            window.location.href = loginPageRedirect
+            }
+        },
+
+        url: likeFormUrl,
+        method: "POST",
+
+        data: {
+            article_id: $('.article_id').val(),
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+        },
+
+        success: function(response) {
+            /*
+             * Changes the number of likes asynchrously.
+             * @param {JSON} response - Response from the server.
+             */
+
+            if(response.status == 200) {
+                function plural(word, count) {
+                    /*
+                     * Pluralizes the number of counts
+                     * @param {string} word - Text to be pluralized.
+                     * @param {integer} count - Number which determines pluralization of word. 
+                     */
+
+                    if (count === 1){
+                        var likes = count + ' ' + word
+                    } else {
+                        var likes = count + ' ' + word + 's'
+                    }
+                    return likes
+                }
+
+                var likesNum = response.article_likes
+                
+                var likesText = plural("Like", likesNum)
+                $('#likes-num').text(likesText)
+                $('#like-button').val(response.button_value)
+            }
+        },
+    });
+});
 
 
+// For Asynchronous Saving and Unsaving of Articles
+$(document).on('submit', '#save-form', function(event){
+    /*
+     * Bookmarks an article logged in user clicks on the form.
+     */
+    event.preventDefault();
 
+    $.ajax({
 
-// function show_reply_box() {
-//     document.getElementsByClassName('reply-box')[0].style.height="60px"
-//     document.getElementsByClassName('reply-box')[0].style.display="block"
-//     document.getElementById('show').style.display="none";
-// }
+        beforeSend: function() {
+            /*
+             * Users are redirected to login page if there are not logged in. 
+             */
 
+            if (userAuthenticated == false) {
+                window.location.href = loginPageRedirect
+                }
+        },
 
-// function hide_reply_box() {
-//     document.getElementsByClassName('reply-box')[0].style.height="0px"
-//     document.getElementsByClassName('reply-box')[0].style.display="none"
-//     document.getElementById('show').style.display="block";
-// }
+        url: saveFormUrl,
+        method: "POST",
+
+        data: {
+            article_id: $('.article_id').val(),
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+        },
+
+        success: function(response) {
+                /*
+                 * Changes the save button button value to save/unsave.
+                 * @param {JSON} response - Response from the server.
+                 */
+
+            if(response.status == 200) {
+                $('#save-button').val(response.button_value)
+            }
+        },
+    });
+});

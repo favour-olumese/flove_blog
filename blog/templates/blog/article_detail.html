@@ -47,11 +47,12 @@
         <small>Reading time: {{ article_time }}</small>
 
         <!-- Save/Unsave Article -->
-        <form action="{% url 'save-article' article.writer.user article.article_url %}" method="post">
+        <form id="save-form">
             {% csrf_token %}
             <input type="hidden" name="article_id" value="{{ article.id }}">
 
-            <input type="submit" value="Save">
+            <input id="save-button" type="submit"
+            value="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
         </form>
 
         <!-- Articles text -->
@@ -62,7 +63,7 @@
         
         <span id="likes-num">{{ num_of_likes }} Like{{ num_of_likes|pluralize }}</span>
 
-        <form id="like-form" action="{% url 'like-article' article.writer.user article.article_url %}" method="post">
+        <form id="like-form">
             {% csrf_token %}
             <input type="hidden" class="article_id" name="article_id" value="{{ article.id }}">
 
@@ -116,6 +117,7 @@
                                 <textarea name="reply_text" style="width: 100px; height: 30px;"></textarea><br>
                                 <input type="submit" value="Reply" style="width: 45px; height: 15px;font-size: 9px; display: inline;">
                             </form>
+
                             <!-- <button id="cancel-reply">Cancel</button> -->
                             <a href="" id="cancel-reply" onclick="return false">Cancel</a>
 
@@ -153,70 +155,10 @@
         {% endif %}
     {% endif%}
 
-    <script src="{% static 'js/index.js'%}"></script>
+    <!-- Data values that would be sent to external JavaScript -->
+    <div id="check-authenticaton", data-check_authentication="{{ user.is_authenticated|lower }}"></div>
+    <div id="login-page-redirect" data-login_page_redirect="{% url 'login' %}?next={{ request.path }}"></div>
+    <div id="like-form-url" data-like_form_url="{% url 'like-article' article.writer.user article.article_url %}"></div>
+    <div id="save-form-url" data-save_form_url="{% url 'save-article' article.writer.user article.article_url %}"></div>
 
-    <script>
-        // Confirms if user is logged in.
-        const userAuthenticated = {{ user.is_authenticated|lower }};
-        
-        $(document).on('submit', '#like-form', function(event){
-            /*
-             * Update the number of likes when the like form is submitted
-             */
-            event.preventDefault();
-
-            $.ajax({
-
-                beforeSend: function() {
-                /*
-                 * Users are redirected to login page if there are not logged in. 
-                 */
-
-                if (userAuthenticated == false) {
-                    window.location.href = "{% url 'login' %}?next={{ request.path }}"
-                    }
-                },
-
-                url: "{% url 'like-article' article.writer.user article.article_url %}",
-                method: "POST",
-
-                data: {
-                    article_id: $('.article_id').val(),
-                    article_path: $('.article_path').val(),
-                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
-                },
-
-                success: function(response) {
-                    /*
-                     * Changes the number of likes asynchrously.
-                     * @param {JSON} response - Response from the server.
-                     */
-
-                    if(response.status == 200) {
-                        function plural(word, count) {
-                            /*
-                             * Pluralizes the number of counts
-                             * @param {string} word - Text to be pluralized.
-                             * @param {integer} count - Number which determines pluralization of word. 
-                             */
-
-                            if (count === 1){
-                                var likes = count + ' ' + word
-                            } else {
-                                var likes = count + ' ' + word + 's'
-                            }
-                            return likes
-                        }
-
-                        var likesNum = response.article_likes
-                        
-                        var likesText = plural("Like", likesNum)
-                        $('#likes-num').text(likesText)
-                        $('#like-button').val(response.button_value)
-                    }
-                },
-            });
-        });
-        
-    </script>
 {% endblock %}

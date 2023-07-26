@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-{{article_list}}
+
 <a href="{% url 'new-article' %}">Write</a>
 {% for article in article_list %}
     <div style="border-style: solid;">
@@ -19,9 +19,9 @@
         <form action="{% url 'save-article' article.writer.user article.article_url %}" method="post">
             {% csrf_token %}
             <input type="hidden" name="article_id" value="{{ article.id }}">
-            <input type="hidden" name="article_path" value="{{ request.path }}">
 
-            <input type="submit" value="Save">
+            <input id="save-button" type="submit"
+            value="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
         </form>
 
         {% if request.user.writer.id == article.writer.id %}
