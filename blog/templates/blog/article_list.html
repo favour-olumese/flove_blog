@@ -6,6 +6,7 @@
 
 {% block content %}
 {{article_list}}
+<a href="{% url 'new-article' %}">Write</a>
 {% for article in article_list %}
     <div style="border-style: solid;">
         <a href="{{ article.get_absolute_url }}">
@@ -13,7 +14,6 @@
         </a>
         <small>{{ article.writer }}</small>
         <small>{{ article.get_article_status_display }}</small>
-        <a href="{% url 'new-article' %}">Write</a>
 
         <!-- Save/Unsave Article -->
         <form action="{% url 'save-article' article.writer.user article.article_url %}" method="post">

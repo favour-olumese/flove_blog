@@ -50,7 +50,6 @@
         <form action="{% url 'save-article' article.writer.user article.article_url %}" method="post">
             {% csrf_token %}
             <input type="hidden" name="article_id" value="{{ article.id }}">
-            <input type="hidden" name="article_path" value="{{ request.path }}">
 
             <input type="submit" value="Save">
         </form>
@@ -60,13 +59,16 @@
         
         <!-- Article Likes -->
         {% with num_of_likes=article.likes.count %}
-        <span>{{ num_of_likes }} Like{{ num_of_likes|pluralize }}</span>
-        <form action="{% url 'like-article' article.writer.user article.article_url %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="article_id" value="{{ article.id }}">
-            <input type="hidden" name="article_path" value="{{ request.path }}">
+        
+        <span id="likes-num">{{ num_of_likes }} Like{{ num_of_likes|pluralize }}</span>
 
-            <input type="submit" value="Like">
+        <form id="like-form" action="{% url 'like-article' article.writer.user article.article_url %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" class="article_id" name="article_id" value="{{ article.id }}">
+
+            <input id="like-button" type="submit" 
+                value="{% if request.user.writer in article.likes.all %}Unlike{% else %}Like{% endif %}">
+
         </form>
         {% endwith %}
         <div>
@@ -84,7 +86,6 @@
             <!-- Form for comments. -->
             <form action="{% url 'article-comments' article.writer.user article.article_url %}" method="post">
                 {% csrf_token %}
-                <input type="hidden" name="article_id" value="{{ article.id }}">
                 <input type="hidden" name="commenter" value="{{ request.user.writer }}">
 
                 <textarea name="text" cols="30" rows="5"></textarea><br>
@@ -153,4 +154,69 @@
     {% endif%}
 
     <script src="{% static 'js/index.js'%}"></script>
+
+    <script>
+        // Confirms if user is logged in.
+        const userAuthenticated = {{ user.is_authenticated|lower }};
+        
+        $(document).on('submit', '#like-form', function(event){
+            /*
+             * Update the number of likes when the like form is submitted
+             */
+            event.preventDefault();
+
+            $.ajax({
+
+                beforeSend: function() {
+                /*
+                 * Users are redirected to login page if there are not logged in. 
+                 */
+
+                if (userAuthenticated == false) {
+                    window.location.href = "{% url 'login' %}?next={{ request.path }}"
+                    }
+                },
+
+                url: "{% url 'like-article' article.writer.user article.article_url %}",
+                method: "POST",
+
+                data: {
+                    article_id: $('.article_id').val(),
+                    article_path: $('.article_path').val(),
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                },
+
+                success: function(response) {
+                    /*
+                     * Changes the number of likes asynchrously.
+                     * @param {JSON} response - Response from the server.
+                     */
+
+                    if(response.status == 200) {
+                        function plural(word, count) {
+                            /*
+                             * Pluralizes the number of counts
+                             * @param {string} word - Text to be pluralized.
+                             * @param {integer} count - Number which determines pluralization of word. 
+                             */
+
+                            if (count === 1){
+                                var likes = count + ' ' + word
+                            } else {
+                                var likes = count + ' ' + word + 's'
+                            }
+                            return likes
+                        }
+
+                        var likesNum = response.article_likes
+                        
+                        var likesText = plural("Like", likesNum)
+                        $('#likes-num').text(likesText)
+                        $('#like-button').val(response.button_value)
+                    }
+                },
+            });
+        });
+        
+    </script>
 {% endblock %}

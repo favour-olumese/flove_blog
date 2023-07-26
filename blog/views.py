@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth.models import User
 from django.views.generic import ListView, DetailView
@@ -300,31 +300,56 @@ def article_filter(request):
 def article_likes(request, username, article_url):
     """Function for liking articles
     
-    Writers who likes an article are added to the likes field of the Article model.
+    - Writers who likes an article are added to the 
+    likes field of the Article model.
+    - If GET method is used, the users are redirected the article.
+    - If POST method is used the data is saved in the database and 
+    a JSON response is sent to update the page asynchronously
     """
 
-    request_path = request.POST.get('article_path')
+    path_url = request.path
+
+    path_url_list = path_url.split('/')
+
+    # Turncate the '/like' portion of the url.
+    article_path = '/'.join(path_url_list[:-1])
 
     if request.method == 'POST':
         article = get_object_or_404(Article, id=request.POST.get('article_id'))
 
         if article.likes.filter(id=request.user.writer.id).exists():
             article.likes.remove(request.user.writer)
+            button_value = 'Like'
         else:
             article.likes.add(request.user.writer)
+            button_value = 'Unlike'
+        
+        article_likes = article.likes.count()
+        status = 200
 
-    return HttpResponseRedirect(request_path)
-    # return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))
+        context = {
+            'article_likes': article_likes,
+            'status': status,
+            'button_value': button_value,
+        }
+        return JsonResponse(context)
+
+    return HttpResponseRedirect(article_path)
 
 
 @login_required
 def save_article(request, username, article_url):
     """Function for saving of articles by writers.
     
-    Articles liked by a writer are added to the saved_articles field of the Writer.
+    Articles saved by a writer are added to the saved_articles field of the Writer.
     """
 
-    request_path = request.POST.get('article_path')
+    path_url = request.path
+
+    path_url_list = path_url.split('/')
+
+    # Turncate the '/like' portion of the url.
+    article_path = '/'.join(path_url_list[:-1])
 
     if request.method == 'POST':
         article_id = request.POST.get('article_id')
@@ -335,7 +360,7 @@ def save_article(request, username, article_url):
         else:
             writer.saved_articles.add(article_id)
 
-    return HttpResponseRedirect(request_path)
+    return HttpResponseRedirect(article_path)
 
 
 class WriterCreateView(LoginRequiredMixin, CreateView):
