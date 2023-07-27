@@ -62,7 +62,7 @@ class Article(models.Model):
 
 
     class Meta:
-        ordering = ['-update_date']
+        ordering = ['-pub_date']
 
     def get_absolute_url(self):
         """Returns url of each article."""
@@ -82,6 +82,9 @@ class Comment(models.Model):
     commenter = models.ForeignKey(Writer, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-date']
 
     def __str__(self):
         """String name"""
@@ -112,7 +115,10 @@ class Reply(models.Model):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)  # Comment replied to
     date = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-date']
+
     def __str__(self):
-        """String name"""
+        """Returns string name"""
 
         return f'{self.replier} replied {self.comment}'
