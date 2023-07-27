@@ -60,8 +60,8 @@ $(document).on('submit', '#like-form', function(event){
          * Users are redirected to login page if there are not logged in. 
          */
 
-        if (userAuthenticated == false) {
-            window.location.href = loginPageRedirect
+            if (userAuthenticated == false) {
+                window.location.href = loginPageRedirect
             }
         },
 

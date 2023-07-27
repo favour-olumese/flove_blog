@@ -366,7 +366,7 @@ def save_article(request, username, article_url):
 
         context = {
             'button_value': button_value,
-            'status': status
+            'status': status,
         }
 
         return JsonResponse(context)
@@ -475,7 +475,10 @@ def comment(request, username, article_url):
                 commenter=commenter,
                 article=article,
             )
-
+            context = {
+                'response': Comment.objects.filter(article=article_id).values()[:],
+            }
+            return JsonResponse(context)
         # Using the message field to display errors
         else:
             messages.error(request, 'Text field required.')

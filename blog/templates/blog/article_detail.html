@@ -21,20 +21,20 @@
         <!--
             Date article was published or updated.
             If the article has been updated, the updated date would display
-            instead of the publication date.
+            alongside the publication date.
 
             The 'date:"mdf"' allows for comparing the year, month, day, hour, and minute
             For example; 202305041512 means 2023, May 04. 15:12.
         -->
         <small>
-        {% if article.update_date|date:"YmdHi" == article.pub_date|date:"YmdHi" %}
             Published on {{ article.pub_date }}
-
-        {% else %}
-            Updated on {{ article.update_date }}            
+        </small><br>
+        <small>
+            {% if article.update_date|date:"YmdHi" != article.pub_date|date:"YmdHi" %}
+                Updated on {{ article.update_date }}            
+            {% endif %}
         </small>
         
-        {% endif %}
 
         <!-- Article audio -->
         {% if article.article_audio and article.display_audio == 'y' %}
@@ -85,11 +85,11 @@
             {% endif %}
 
             <!-- Form for comments. -->
-            <form action="{% url 'article-comments' article.writer.user article.article_url %}" method="post">
+            <form id="comment-form" action="{% url 'article-comments' article.writer.user article.article_url %}" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="commenter" value="{{ request.user.writer }}">
 
-                <textarea name="text" cols="30" rows="5"></textarea><br>
+                <textarea id="text" name="text" cols="30" rows="5"></textarea><br>
                 <input type="submit" value="Comment">
             </form>
 
@@ -123,6 +123,7 @@
 
 
                             <!-- Comment replies -->
+                            <div id="comment-box">
                             {% if comment.reply_set.all %}
                             <br><small>Replies</small>
                                 <ul>
@@ -134,6 +135,7 @@
                                     {% endfor %}
                                 </ul>
                             {% endif %}
+                            </div>
                             <br>
                         </div>
                     </li>
@@ -160,5 +162,38 @@
     <div id="login-page-redirect" data-login_page_redirect="{% url 'login' %}?next={{ request.path }}"></div>
     <div id="like-form-url" data-like_form_url="{% url 'like-article' article.writer.user article.article_url %}"></div>
     <div id="save-form-url" data-save_form_url="{% url 'save-article' article.writer.user article.article_url %}"></div>
+    <div id="comment-form-url" data-comment_form_url="{% url 'article-comments' article.writer.user article.article_url %}"></div>
 
+    <script>
+        $(document).on('submit', '#comment-form', function(event){
+            event.preventDefault();
+            const userAuthenticated = $('#check-authenticaton').data('check_authentication')
+            var commentForm = $('#comment-form-url').data('comment_form_url')
+            var loginPageRedirect = $('#login-page-redirect').data('login_page_redirect')
+
+            $.ajax({
+                beforeSend: function(){
+                    if (userAuthenticated == false) {
+                        window.location.href = loginPageRedirect
+                    }
+                },
+
+                url: commentForm,
+                method: 'POST',
+                data: {
+                    commenter: $('#commenter').val(),
+                    text: $('#text').val(),
+                    article_id: $('.article_id').val(),
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function(response){
+
+                    // Empty the textarea
+                    $('#text').val('')
+                    console.log(response)
+                    $('#comment-box').html(response)
+                },
+            });
+        });
+    </script>
 {% endblock %}
