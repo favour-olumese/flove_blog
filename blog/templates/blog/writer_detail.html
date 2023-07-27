@@ -89,12 +89,14 @@
                 <small>{{ article.get_article_status_display }}</small>
 
                  <!-- Save/Unsave Article -->
-                <form action="{% url 'save-article' article.writer.user article.article_url %}" method="post">
+                 <form class="save-form">
                     {% csrf_token %}
-                    <input type="hidden" name="article_id" value="{{ article.id }}">
-                    <input type="hidden" name="article_path" value="{{ request.path }}">
+                    <input class="article_id" type="hidden" name="article_id" value="{{ article.id }}">
 
-                    <input type="submit" value="Save">
+                    <input id="save-button" type="submit"
+                    value="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
+
+                    <div id="save-form-url" data-save_form_url="{% url 'save-article' article.writer.user article.article_url %}"></div>
                 </form>
 
                 {% if request.user == article.writer.user %}
@@ -107,4 +109,6 @@
     {% empty %}
     <p>There are no articles</p>
     {% endfor %}
+    <div id="check-authenticaton", data-check_authentication="{{ user.is_authenticated|lower }}"></div>
+    <div id="login-page-redirect" data-login_page_redirect="{% url 'login' %}?next={{ request.path }}"></div>
 {% endblock %}

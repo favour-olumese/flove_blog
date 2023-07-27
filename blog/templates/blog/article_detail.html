@@ -47,7 +47,7 @@
         <small>Reading time: {{ article_time }}</small>
 
         <!-- Save/Unsave Article -->
-        <form id="save-form">
+        <form class="save-form">
             {% csrf_token %}
             <input type="hidden" name="article_id" value="{{ article.id }}">
 

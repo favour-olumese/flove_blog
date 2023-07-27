@@ -107,7 +107,7 @@ $(document).on('submit', '#like-form', function(event){
 
 
 // For Asynchronous Saving and Unsaving of Articles
-$(document).on('submit', '#save-form', function(event){
+$(document).on('submit', '.save-form', function(event){
     /*
      * Bookmarks an article logged in user clicks on the form.
      */
