@@ -6,15 +6,25 @@
 
 {% block content %}
 
-<a href="{% url 'new-article' %}">Write</a>
-{% for article in article_list %}
-    <div style="border-style: solid;">
-        <a href="{{ article.get_absolute_url }}">
-            <p>{{ article.title }}</p>
-        </a>
-        <small>{{ article.writer }}</small>
-        <small>{{ article.get_article_status_display }}</small>
+<nav>
+    <a href="{% url 'new-article' %}">Write</a>
+</nav>
 
+
+<div class="body-content">
+{% for article in article_list %}
+    <div style="border: 1px solid; padding: 20px; border-radius: 20px;">
+        <a href="{{ article.writer.get_absolute_url }}"><small>{{ article.writer }}</small></a>
+        <a href="{{ article.get_absolute_url }}">
+            {% if article.article_img %}
+                <img src="{{ article.article_img.url }}" alt="" style="width: 30%; float: right; border-radius: 30px;">
+            {% endif %}
+            <div style="width: 60%;" >
+                <h3>{{ article.title }}</h3>
+                <p>{{ article.text|truncatechars_html:150 }}</p>
+                <small>{{ article.get_article_status_display }}</small>
+            </div>
+        </a>
         <!-- Save/Unsave Article -->
         <form class="save-form">
             {% csrf_token %}
@@ -31,11 +41,13 @@
             <a href="{% url 'delete-article' article.writer.user article.article_url %}">Delete</a>
         {% endif %}
     </div>
+    <hr>
 
 {% empty %}
     <p>There are no articles</p>
 
 {% endfor %}
-    <div id="check-authenticaton", data-check_authentication="{{ user.is_authenticated|lower }}"></div>
-    <div id="login-page-redirect" data-login_page_redirect="{% url 'login' %}?next={{ request.path }}"></div>
+</div>
+<div id="check-authenticaton", data-check_authentication="{{ user.is_authenticated|lower }}"></div>
+<div id="login-page-redirect" data-login_page_redirect="{% url 'login' %}?next={{ request.path }}"></div>
 {% endblock %}

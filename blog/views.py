@@ -61,8 +61,12 @@ def register_user(request):
             user_username = form.cleaned_data['username']
             user_password = form.cleaned_data['password1']
 
-            user = User.objects.create_user(username=user_username, email=user_email, password=user_password)
-            
+            user = User.objects.create_user(
+                username=user_username, 
+                email=user_email, 
+                password=user_password,
+                )
+
             # Make user unactive until they click link to token in email
             user.is_active = False
 
@@ -149,8 +153,10 @@ class ArticleDetailView(DetailView):
         user_id = User.objects.filter(username=writer_username).values()[0]['id']
         writer  = Writer.objects.get(user=user_id)
 
-        more_article = Article.objects.filter(writer=writer).exclude(article_url=article_url)[:3]
+        more_article = Article.objects.filter(writer=writer).exclude(article_url=article_url).exclude(article_status='d')[:3]
         context['more_article'] = more_article
+
+        print('Hello', more_article)
 
         return context
 

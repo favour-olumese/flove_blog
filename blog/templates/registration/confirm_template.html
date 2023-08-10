@@ -1,13 +1,17 @@
 {% extends 'blog/base.html' %}
 
 {% block title %}
-    <title>Email comfirmation | Flove</title>
+    <title>Email Comfirmation | Flove</title>
 {% endblock title %}
 
 {% block content %}
+<div class="body-content">
     {% if success %}
+    <p>
         {{ user.username }}, your account is confirmed!
+    </p>
     {% else %}
         Error, invalid token!
     {% endif %}
+</div>    
 {% endblock content %}

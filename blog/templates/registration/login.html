@@ -1,34 +1,45 @@
 {% extends "blog/base.html" %}
 
+{% block title %}
+    <title>Login | Flove</title>
+{% endblock %}
+
 {% block content %}
+<div class="body-content">
+    
+    <h1>Welcome back</h1>
     {% if user.is_authenticated %}
         <p>You are currently logged in.</p>
         <p><a href="{% url 'logout' %}">Logout</a></p>
         <p>Return to <a href="{% url 'home' %}">Homepage</a></p>
-    {% else %}
 
+    {% else %}
+    <!-- 
         {% if form.errors %}
             <p>Your username and password didn't match. Please try again.</p>
-        {% endif %}
+        {% endif %} 
+    -->
 
         {% if next %}
             {% if user.is_authenticated %}
             <p>Your account doesn't have access to this page. To proceed,
             please login with an account that has access.</p>
+
             {% else %}
             <p>Please login to see this page.</p>
+
             {% endif %}
         {% endif %}
 
         <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
-                {{ form.as_p }}
+            {{ form.as_p }}
 
             <input type="submit" value="Login">
             <input type="hidden" name="next" value="{{ next }}">
         </form>
-
+        <p>Not registered? <a href="{% url 'register' %}">Sign up</a></p>
         <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
     {% endif %}
-
+</div>
 {% endblock %}

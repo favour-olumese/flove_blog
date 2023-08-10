@@ -1,7 +1,11 @@
 {% extends "blog\base.html" %}
 
-{% block content %}
+{% block title %}
+    <title>Sign Up | Flove</title>
+{% endblock %}
 
+{% block content %}
+<div class="body-content">
     {% if form.errors %}
         {% for field, error in form.errors.items %}
         <li style="color: red;">{{ error }}</li>
@@ -13,8 +17,9 @@
         <!-- TODO: Add a login text if email already exist -->
     {% endif %}
 
-    <form method="post" action="">
+    <form method="post" action="" class="register-form">
         {% csrf_token %}
+        <h1>Glad to have you here!</h1>
         <table>
             <tr>
                 <td>{{ form.username.label }}:</td>
@@ -34,7 +39,11 @@
             </tr>
         </table>
 
-        <input type="submit" value="Register">
+        <input type="submit" value="Sign up">
+        <div>
+            <p>Already registered? <a href="{% url 'login' %}">Login</a></p>
+        </div>
     </form>
-
+    
+</div>
 {% endblock %}

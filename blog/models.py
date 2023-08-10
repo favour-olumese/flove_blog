@@ -18,16 +18,15 @@ class Writer(models.Model):
     saved_articles = models.ManyToManyField("Article", related_name='saved_articles', blank=True)
 
     class Meta:
+        """Orders writers based on their last name and first name."""
         ordering = ['last_name', 'first_name']
 
     def get_absolute_url(self):
         """Returns url of each writer."""
-
         return reverse('writer', kwargs={'username':self.user})
 
     def __str__(self):
         """Returns writer's name."""
-
         return f'{self.last_name} {self.first_name}'
 
 
@@ -62,16 +61,15 @@ class Article(models.Model):
 
 
     class Meta:
+        """Orders articles based on recently published."""
         ordering = ['-pub_date']
 
     def get_absolute_url(self):
         """Returns url of each article."""
-
         return reverse('article-detail', kwargs={'article_url':self.article_url, 'username':self.writer.user})
 
     def __str__(self):
         """Returns article title."""
-
         return f'{self.title} by {self.writer}'
 
 
@@ -84,30 +82,16 @@ class Comment(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """Orders comments based on recently published."""
         ordering = ['-date']
 
     def __str__(self):
         """String name"""
-
         return f'{self.commenter} comment in {self.article}'
 
 
-# class Reply(models.Model):
-#     """Class containing reply to comments of writers."""
-
-#     text = models.TextField()
-#     replier = models.ForeignKey(Writer, on_delete=models.CASCADE)
-#     article = models.ForeignKey(Article, on_delete=models.CASCADE)
-#     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
-#     date = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         """String name"""
-
-#         return f'{self.commenter} comment in {self.article}' 
-
 class Reply(models.Model):
-    """Class containing comments of writers."""
+    """Class containing replies to comments."""
 
     reply_text = models.TextField()
     replier = models.ForeignKey(Writer, on_delete=models.CASCADE)
@@ -116,9 +100,9 @@ class Reply(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """Orders replies based on recently published."""
         ordering = ['-date']
 
     def __str__(self):
         """Returns string name"""
-
         return f'{self.replier} replied {self.comment}'
