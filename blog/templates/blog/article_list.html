@@ -14,10 +14,18 @@
 <div class="body-content">
 {% for article in article_list %}
     <div style="border: 1px solid; padding: 20px; border-radius: 20px;">
-        <a href="{{ article.writer.get_absolute_url }}"><small>{{ article.writer }}</small></a>
+        <div>
+            <a href="{{ article.writer.get_absolute_url }}">
+                
+                {% if article.writer.profile_picture %}
+                    <img src="{{ article.writer.profile_picture.url }}" alt="" style="width: 25px; border-radius: 30px; float: left;">
+                {% endif %}
+                <small style="clear: right; padding: 4px 0 10px 4px;" >{{ article.writer }}</small>
+            </a>
+        </div>
         <a href="{{ article.get_absolute_url }}">
             {% if article.article_img %}
-                <img src="{{ article.article_img.url }}" alt="" style="width: 30%; float: right; border-radius: 30px;">
+                <img src="{{ article.article_img.url }}" alt=""m style="width: 30%; float: right; border-radius: 30px;">
             {% endif %}
             <div style="width: 60%;" >
                 <h3>{{ article.title }}</h3>
@@ -25,6 +33,7 @@
                 <small>{{ article.get_article_status_display }}</small>
             </div>
         </a>
+
         <!-- Save/Unsave Article -->
         <form class="save-form">
             {% csrf_token %}

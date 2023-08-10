@@ -8,6 +8,10 @@ a {
     color: black;
 }
 
+a:hover {
+    color: blue;
+}
+
 /* Hide reply box, would be activated using JavaScript */
 .reply-box {
     display: none;
@@ -34,6 +38,21 @@ a {
 .body-content {
     width: 60%;
     margin: auto;
+}
+
+
+/* Writer's Page */
+.writer-page-body-content {
+    width: 60%;
+    padding: 5%;
+}
+
+.writer-page-sidebar {
+    width: 26%;
+    float: right;
+    padding: 2%;
+    border-left: 1px gray solid;
+    border-bottom: 1px gray solid;
 }
 
 
