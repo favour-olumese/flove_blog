@@ -1,4 +1,8 @@
 /* Global */
+ul {
+    padding: 0;
+}
+
 li {
     list-style: none;
 }
@@ -10,6 +14,17 @@ a {
 
 a:hover {
     color: blue;
+}
+
+/* Navigation Bar */
+.nav-bar-anchor {
+    padding: 4px 8px;
+    border-radius: 15px;
+    margin: 2px;
+}
+
+.nav-bar-anchor:hover {
+    border: 1px solid gray;
 }
 
 /* Hide reply box, would be activated using JavaScript */
