@@ -1,3 +1,5 @@
+{% load app_tags %}
+
 <!DOCTYPE html>
 <html lang="en">
     {% load static %}
@@ -6,6 +8,8 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+        <!-- jQuery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
         
         {% block title %}
@@ -14,6 +18,26 @@
 
     </head>
     <body>
+        {% block navbar %}
+        <nav style="border-bottom: 1px solid gray;">
+            <a href="{% url 'new-article' %}">Write</a>
+            {% if user.is_authenticated %}
+                    <img src="{% if user.writer.profile_picture %}
+                    {{ user.writer.profile_picture.url }}
+                    {% else %}
+                    {{ user|gravatar }}" 
+                    alt="{{ user.writer }}"
+                    title="{{ user.writer }}"
+                    style="width: 30px; border-radius: 30px;">
+
+                {% endif %}
+            {% endif %}
+            
+
+
+        </nav>
+        {% endblock %}
+
         {% block sidebar %}
         {% endblock %}
 

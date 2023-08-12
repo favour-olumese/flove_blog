@@ -1,4 +1,5 @@
 {% extends 'blog/base.html' %}
+{% load app_tags %}
 
 {% block title %}
     <title>Articles | Flove</title>
@@ -6,26 +7,28 @@
 
 {% block content %}
 
-<nav>
-    <a href="{% url 'new-article' %}">Write</a>
-</nav>
-
-
 <div class="body-content">
 {% for article in article_list %}
     <div style="border: 1px solid; padding: 20px; border-radius: 20px;">
         <div>
             <a href="{{ article.writer.get_absolute_url }}">
                 
-                {% if article.writer.profile_picture %}
-                    <img src="{{ article.writer.profile_picture.url }}" alt="" style="width: 25px; border-radius: 30px; float: left;">
+                
+                <img src="{% if article.writer.profile_picture %}
+                {{ article.writer.profile_picture.url }}
+                {% else %}
+                {{ article.writer.user|gravatar }}
                 {% endif %}
+                "
+
+                alt="{{ article.writer }}"
+                style="width: 25px; border-radius: 30px; float: left;">
                 <small style="clear: right; padding: 4px 0 10px 4px;" >{{ article.writer }}</small>
             </a>
         </div>
         <a href="{{ article.get_absolute_url }}">
             {% if article.article_img %}
-                <img src="{{ article.article_img.url }}" alt=""m style="width: 30%; float: right; border-radius: 30px;">
+                <img src="{{ article.article_img.url }}" alt="" style="width: 30%; float: right; border-radius: 30px;">
             {% endif %}
             <div style="width: 60%;" >
                 <h3>{{ article.title }}</h3>

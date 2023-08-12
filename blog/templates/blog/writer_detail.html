@@ -1,4 +1,5 @@
 {% extends 'blog/base.html' %}
+{% load app_tags %}
 
 {% block title %}
     <title>
@@ -20,10 +21,15 @@
 {% endblock %}
 
 {% block sidebar %}
-    <div class="writer-page-sidebar">
-        {% if writer.profile_picture %}
-            <img src="{{ writer.profile_picture.url }}" alt="" style="width: 120px; border-radius: 50px;">
-        {% endif %}
+    <div class="writer-page-sidebar" style="border: 1px gray solid; box-shadow: 1px 1px 1px 1px grey; margin-top: 30px;">
+        
+        <img src="{% if writer.profile_picture %}
+        {{ writer.profile_picture.url }}
+        {% else %}
+        {{ writer.user|gravatar }}
+        {% endif %}"
+        alt="" style="width: 100px; border-radius: 50px;">
+        
         <h3>{{ writer }}</h3>
 
         {% if writer.bio %}
@@ -54,9 +60,8 @@
 {% block content %}
 <div class="writer-page-body-content" style="padding: 0 5%;">
     {% if request.user == writer.user %}
-        <a href="{% url 'new-article' %}">Write</a>
 
-        <!-- For filtering articles -->
+        <!-- Form for filtering articles -->
 
         <form action="{% url 'filter' %}" method="get">
             <select name="article_status" id="filter">
