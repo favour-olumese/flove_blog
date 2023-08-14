@@ -156,8 +156,6 @@ class ArticleDetailView(DetailView):
         more_article = Article.objects.filter(writer=writer).exclude(article_url=article_url).exclude(article_status='d')[:3]
         context['more_article'] = more_article
 
-        print('Hello', more_article)
-
         return context
 
 
@@ -392,6 +390,20 @@ class WriterCreateView(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
+    def get(self, request, *args, **kwargs):
+        """Redirects users who have created their writer profile already 
+        to the writer's update page.
+        
+        If user has not created a profile, they are taken to the profile
+        creation page.
+        """
+        username = request.user
+
+        if Writer.objects.filter(user=username).exists():
+            return redirect(reverse_lazy('writer-profile-update', kwargs={'username':username}))
+
+        return super().get(request, *args, *kwargs)
+
 
 class WriterUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """View for updating user details."""
@@ -412,7 +424,7 @@ class WriterUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         """"Works with UserPassesTestMixin.
 
-        Returns True when current user is the profile onwer;
+        Returns True when current user is the profile owner;
         but returns False when current user is not.
         """
 

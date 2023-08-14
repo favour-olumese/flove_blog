@@ -84,6 +84,12 @@
         <br>
     {% endif %}
 
+    {% if user != 'AnonymousUser' and user.writer == '' %}
+        <p>Please, kindly create your writer profile to fully access this page.</p>
+        <a href="{% url 'new-writer' %}"><button>Create Writer Profile</button></a>
+
+    {% else %}
+    
         {% for article in article_list %}
 
             <!-- Ensures that only user can see unlisted articles -->
@@ -125,6 +131,7 @@
         {% empty %}
         <p>There are no articles</p>
         {% endfor %}
+    {% endif %}
     </div>
     <div id="check-authenticaton", data-check_authentication="{{ user.is_authenticated|lower }}"></div>
     <div id="login-page-redirect" data-login_page_redirect="{% url 'login' %}?next={{ request.path }}"></div>

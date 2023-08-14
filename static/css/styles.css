@@ -27,6 +27,15 @@ a:hover {
     border: 1px solid gray;
 }
 
+.nav-element {
+    float: right;
+    padding-right: 10px;
+}
+
+.nav-image {
+    cursor: pointer;
+}
+
 /* Hide reply box, would be activated using JavaScript */
 .reply-box {
     display: none;

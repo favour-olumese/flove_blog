@@ -34,7 +34,7 @@
             </a>
 
             <div style="width: 30%;; float: right; margin: auto; padding: 5px;">
-                <span style="float: right; padding-right: 10px;">
+                <span class="nav-image nav-element">
                     {% if user.is_authenticated %}
                         <img class="user-picture" src="{% if user.writer.profile_picture %}
                         {{ user.writer.profile_picture.url }}
@@ -47,7 +47,7 @@
                         
                     {% endif %}
                 </span>
-                <span style="float: right; padding-right: 10px;">
+                <span class="nav-element">
                     <a href="{% url 'new-article' %}" class="nav-bar-anchor">Write</a>
 
                     {% if not user.is_authenticated %}
