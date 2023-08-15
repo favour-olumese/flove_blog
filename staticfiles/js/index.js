@@ -100,6 +100,8 @@ $(document).on('submit', '#like-form', function(event){
                 var likesText = plural("Like", likesNum)
                 $('#likes-num').text(likesText)
                 $('#like-button').val(response.button_value)
+            }  else if (response.status == 302){
+                window.location.href = response.writer_profile_page
             }
         },
     });
@@ -141,6 +143,8 @@ $(document).on('submit', '.save-form', function(event){
 
             if(response.status == 200) {
                 $('#save-button').val(response.button_value)
+            } else if (response.status == 302){
+                window.location.href = response.writer_profile_page
             }
         },
     });

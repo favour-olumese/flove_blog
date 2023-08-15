@@ -196,6 +196,21 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
         os.remove('temp_audio.mp3')
 
         return super().form_valid(form)
+    
+    def get(self, request, *args, **kwargs):
+        """Redirects users who have created their writer profile already 
+        to the writer's update page.
+        
+        If user has not created a profile, they are taken to the profile
+        creation page.
+        """
+        username = request.user
+
+        if Writer.objects.filter(user=username).exists():
+            return super().get(request, *args, *kwargs)
+        
+        messages.info(request, 'You have to fill in your writer profile before you can create an article.')
+        return redirect('new-writer')
 
 
 class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -309,6 +324,12 @@ def article_likes(request, username, article_url):
     - If GET method is used, the users are redirected the article.
     - If POST method is used the data is saved in the database and 
     a JSON response is sent to update the page asynchronously
+    - Users yet to create their writer profile are redirected 
+    to the writer creation template.
+    - Users not logged in are redirected to the login  page.
+
+    username        the user requesting to like the article
+    article_url     the url of the article being liked
     """
 
     path_url = request.path
@@ -319,23 +340,37 @@ def article_likes(request, username, article_url):
     article_path = '/'.join(path_url_list[:-1])
 
     if request.method == 'POST':
-        article = get_object_or_404(Article, id=request.POST.get('article_id'))
+        # Check if user already have a writer profile
+        if hasattr(request.user, 'writer'):
+            article = get_object_or_404(Article, id=request.POST.get('article_id'))
 
-        if article.likes.filter(id=request.user.writer.id).exists():
-            article.likes.remove(request.user.writer)
-            button_value = 'Like'
+            if article.likes.filter(id=request.user.writer.id).exists():
+                article.likes.remove(request.user.writer)
+                button_value = 'Like'
+            else:
+                article.likes.add(request.user.writer)
+                button_value = 'Unlike'
+            
+            article_likes = article.likes.count()
+            status = 200
+
+            context = {
+                'article_likes': article_likes,
+                'status': status,
+                'button_value': button_value,
+            }
+
+        # Redirects users yet to create a writer profile to create one.
         else:
-            article.likes.add(request.user.writer)
-            button_value = 'Unlike'
-        
-        article_likes = article.likes.count()
-        status = 200
+            messages.info(request, 'You have to fill in your writer profile before you can like an article.')
+            writer_profile_page = HttpResponseRedirect(reverse_lazy('new-writer')).url
+            status = 302
 
-        context = {
-            'article_likes': article_likes,
-            'status': status,
-            'button_value': button_value,
-        }
+            context = {
+                'writer_profile_page': writer_profile_page,
+                'status': status,
+            }
+
         return JsonResponse(context)
 
     return HttpResponseRedirect(article_path)
@@ -345,33 +380,54 @@ def article_likes(request, username, article_url):
 def save_article(request, username, article_url):
     """Function for saving of articles by writers.
     
-    Articles saved by a writer are added to the saved_articles field of the Writer.
+    - Articles saved by a writer are added to the saved_articles 
+    field of the Writer.
+    - Users yet to create their writer profile are redirected 
+    to the writer creation template.
+    - Users not logged in are redirected to the login page.
+
+    username        the user requesting to save the article
+    article_url     the url of the article being saved
     """
 
     path_url = request.path
 
     path_url_list = path_url.split('/')
 
-    # Turncate the '/like' portion of the url.
+    # Turncate the '/save' portion of the url.
     article_path = '/'.join(path_url_list[:-1])
 
     if request.method == 'POST':
         article_id = request.POST.get('article_id')
-        writer = request.user.writer
 
-        if writer.saved_articles.filter(id=article_id).exists():
-            writer.saved_articles.remove(article_id)
-            button_value = 'Save'
+        # Check if user already have a writer profile
+        if hasattr(request.user, 'writer'):
+            writer = request.user.writer
+
+            if writer.saved_articles.filter(id=article_id).exists():
+                writer.saved_articles.remove(article_id)
+                button_value = 'Save'
+            else:
+                writer.saved_articles.add(article_id)
+                button_value = 'Unsave'
+
+            status = 200
+
+            context = {
+                'button_value': button_value,
+                'status': status,
+            }
+
+        # Redirects users yet to create a writer profile to create one.
         else:
-            writer.saved_articles.add(article_id)
-            button_value = 'Unsave'
+            messages.info(request, 'You have to fill in your writer profile before you can save an article.')
+            writer_profile_page = HttpResponseRedirect(reverse_lazy('new-writer')).url
+            status = 302
 
-        status = 200
-
-        context = {
-            'button_value': button_value,
-            'status': status,
-        }
+            context = {
+                'writer_profile_page': writer_profile_page,
+                'status': status,
+            }
 
         return JsonResponse(context)
 
@@ -414,33 +470,46 @@ class WriterUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_object(self, queryset=None):
         """Function to assign field of the User model that would be used for the url kwarg."""
-
+        
         # Get writer user_id
         username = self.kwargs.get(self.slug_url_kwarg)
         user_id = User.objects.filter(username=username).values()[0]['id']
-
+        
         return get_object_or_404(self.model, user=user_id)
 
     def test_func(self):
         """"Works with UserPassesTestMixin.
 
-        Returns True when current user is the profile owner;
+        - Returns True when current user is the profile owner;
         but returns False when current user is not.
+        - It also returns False the current user tries to access
+        their profile before creating it.
         """
 
         username = self.kwargs['username']
         user_id = User.objects.filter(username=username).values()[0]['id']
-        writer = Writer.objects.filter(user=user_id)[0]
+        if Writer.objects.filter(user=user_id).exists():
+            writer = Writer.objects.filter(user=user_id)[0]
 
-        return writer.user == self.request.user
+            return writer.user == self.request.user
+        else:
+            return False
 
     def handle_no_permission(self, *kwargs):
         """Redirect current user who is not profile owner to the user page.
 
-        By default, test_func redirects user who do not own the profile to the 403 page.
+        - By default, test_func redirects user who do not own 
+        the profile to the 403 page.
+        - If current user tries to update their profile before creating it, 
+        they are redirected to the profile crreation page.
         """
+        username = self.kwargs.get(self.slug_url_kwarg)
+        user_id = User.objects.filter(username=username).values()[0]['id']
         
-        return redirect(reverse_lazy('writer', kwargs={'username':self.kwargs['username']}))
+        if Writer.objects.filter(user=user_id).exists():
+            return redirect(reverse_lazy('writer', kwargs={'username':self.kwargs['username']}))
+        else:
+            return HttpResponseRedirect(reverse_lazy('new-writer'))
 
 
 class WriterDetailView(DetailView):
@@ -475,63 +544,98 @@ class WriterDetailView(DetailView):
 
 @login_required()
 def comment(request, username, article_url):
+    """Function for commenting on articles.
+    
+    - Users yet to create their writer profile are redirected 
+    to the writer creation template.
+    - Users not logged in are redirected to the login page.
+
+    username        the user requesting to save the article
+    article_url     the url of the article being saved
+    """
 
     if request.method == 'POST':
         
-        form = CommentForm(request.POST)
+        # Check if user already have a writer profile
+        if hasattr(request.user, 'writer'):
+            form = CommentForm(request.POST)
 
-        if form.is_valid():
-            form.save(commit=False)
-            comment_text = form.cleaned_data['text']
-            article_id = request.POST['article_id']
-            article = Article.objects.filter(id=article_id)[0]
+            if form.is_valid():
+                form.save(commit=False)
+                comment_text = form.cleaned_data['text']
+                article_id = request.POST['article_id']
+                article = Article.objects.filter(id=article_id)[0]
 
-            commenter = request.user.writer
-            
-            Comment.objects.create(
-                text=comment_text,
-                commenter=commenter,
-                article=article,
-            )
+                commenter = request.user.writer
+                
+                Comment.objects.create(
+                    text=comment_text,
+                    commenter=commenter,
+                    article=article,
+                )
 
-        # Using the message field to display errors
+            # Using the message field to display errors
+            else:
+                messages.error(request, 'Text field required.')
+
+        # Redirects users yet to create a writer profile to create one.
         else:
-            messages.error(request, 'Text field required.')
+            messages.info(request, 'You have to fill in your writer profile '
+                          'before you can comment on an article.')
+
+            return HttpResponseRedirect(reverse_lazy('new-writer'))
 
     return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))
 
 
 @login_required()
 def reply(request, username, article_url):
+    """Function for replying to comments.
+    
+    - Users yet to create their writer profile are redirected 
+    to the writer creation template.
+    - Users not logged in are redirected to the login page.
+
+    username        the user requesting to save the article
+    article_url     the url of the article being saved
+    """
 
     if request.method == 'POST':
+        # Check if user already have a writer profile
+        if hasattr(request.user, 'writer'):            
+            form = ReplyForm(request.POST) # binding the reply text to the form
 
-        form = ReplyForm(request.POST) # binding the reply text to the form
+            if form.is_valid():
+                form.save(commit=False)
+                reply_text = form.cleaned_data['reply_text']
 
-        if form.is_valid():
-            form.save(commit=False)
-            reply_text = form.cleaned_data['reply_text']
+                # Related Article
+                article_id = request.POST['article_id']
+                article = Article.objects.filter(id=article_id)[0]
 
-            # Related Article
-            article_id = request.POST['article_id']
-            article = Article.objects.filter(id=article_id)[0]
+                # Related Comment
+                comment_id = request.POST['comment_id']
+                comment_query = Comment.objects.filter(id=comment_id)[0]
 
-            # Related Comment
-            comment_id = request.POST['comment_id']
-            comment_query = Comment.objects.filter(id=comment_id)[0]
+                # Replier
+                replier = request.user.writer
 
-            # Replier
-            replier = request.user.writer
+                Reply.objects.create(
+                    reply_text=reply_text,
+                    replier=replier,
+                    article=article,
+                    comment=comment_query,
+                )
 
-            Reply.objects.create(
-                reply_text=reply_text,
-                replier=replier,
-                article=article,
-                comment=comment_query,
-            )
-
-        # Using the message field to display errors
+            # Using the message field to display errors
+            else:
+                messages.error(request, 'Text field required.')
+        
+        # Redirects users yet to create a writer profile to create one.
         else:
-            messages.error(request, 'Text field required.')
+            messages.info(request, 'You have to fill in your writer profile '
+                          'before you can reply a comment.')
+
+            return HttpResponseRedirect(reverse_lazy('new-writer'))
 
     return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))

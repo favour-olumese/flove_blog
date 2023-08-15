@@ -1,165 +1,213 @@
 {% extends 'blog/base.html' %}
 {% load static %}
+{% load app_tags %}
 
 {% block title %}
     <title>{{ article.title }} | Flove</title>
 {% endblock %}
 
 {% block content %}
-    <!-- Make drafts only accessible to owner -->
-    {% if article.article_status == 'd' and request.user != article.writer.user %}
-        <p>Not accessible</p>
-
-    {% else %}
-        <h2>{{ article.title }}</h2>
-
-        
-        {% if article.article_img %}
-            <img src="{{ article.article_img.url }}" alt="" style="width: 600px;">
+    <div class="body-content">
+        <!-- Display notification for user to create writer profile if they are yet to create it. -->
+        {% if user != 'AnonymousUser' and user.writer == '' %}
+        <div class="info">
+            <span>
+                Please, kindly create your 
+                <a href="{% url 'new-writer' %}" style="text-decoration: underline;">writer profile</a> 
+                to have full access to features.
+            </span>
+        </div>
         {% endif %}
-        
-        <!--
-            Date article was published or updated.
-            If the article has been updated, the updated date would display
-            alongside the publication date.
 
-            The 'date:"mdf"' allows for comparing the year, month, day, hour, and minute
-            For example; 202305041512 means 2023, May 04. 15:12.
-        -->
-        <small>
-            Published on {{ article.pub_date }}
-        </small><br>
-        <small>
-            {% if article.update_date|date:"YmdHi" != article.pub_date|date:"YmdHi" %}
-                Updated on {{ article.update_date }}            
+        <!-- Make drafts only accessible to owner -->
+        {% if article.article_status == 'd' and request.user != article.writer.user %}
+            <p>Not accessible</p>
+
+        {% else %}
+            <h1>{{ article.title }}</h1>
+
+            <div>
+                <a href="{{ article.writer.get_absolute_url }}">
+                    
+                    
+                    <img src="{% if article.writer.profile_picture %}
+                    {{ article.writer.profile_picture.url }}
+                    {% else %}
+                    {{ article.writer.user|gravatar }}
+                    {% endif %}
+                    "
+    
+                    alt="{{ article.writer }}"
+                    style="width: 50px; border-radius: 30px; float: left; margin-right: 10px;">
+                    <small>{{ article.writer }}</small>
+                </a>
+            </div>
+            
+            
+            <!--
+                Date article was published or updated.
+                If the article has been updated, the updated date would display
+                alongside the publication date.
+
+                The 'date:"mdf"' allows for comparing the year, month, day, hour, and minute
+                For example; 202305041512 means 2023, May 04. 15:12.
+            -->
+
+            <small>
+                Published on {{ article.pub_date }}
+            </small><br>
+            <small>
+                {% if article.update_date|date:"YmdHi" != article.pub_date|date:"YmdHi" %}
+                    Updated on {{ article.update_date }}            
+                {% endif %}
+            </small>
+            <br>
+
+            <hr>
+            <!-- Article Time -->
+            <small>{{ article_time }} read</small>
+
+            <span style="float: right; padding-left: 4px;">
+
+                {% if request.user.writer.id == article.writer.id %}
+                    <a href="{% url 'update-article' article.writer.user article.article_url %}"><button type="button">Update</button></a>
+                    <a href="{% url 'delete-article' article.writer.user article.article_url %}"><button type="button">Delete</button></a>
+                {% endif %}
+            </span>
+            <span style="float: right;">
+                <!-- Save/Unsave Article -->
+                <form class="save-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="article_id" value="{{ article.id }}">
+
+                    <input id="save-button" type="submit"
+                    value="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
+                </form>
+            </span>
+            <hr>
+
+        
+            
+            {% if article.article_img %}
+                <br>
+                <img src="{{ article.article_img.url }}" alt="" style="width: 90%;">
             {% endif %}
-        </small>
-        
-
-        <!-- Article audio -->
-        {% if article.article_audio and article.display_audio == 'y' %}
-            <audio controls controlsList="nodownload" style="width: 230px; height: 30px; display: block; left: 100px;">
-                <source src="{{ article.article_audio.url }}" type="audio/mpeg">
-            </audio>
-        {% endif %}
-        
-        <!-- Article Time -->
-        <small>Reading time: {{ article_time }}</small>
-
-        <!-- Save/Unsave Article -->
-        <form class="save-form">
-            {% csrf_token %}
-            <input type="hidden" name="article_id" value="{{ article.id }}">
-
-            <input id="save-button" type="submit"
-            value="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
-        </form>
-
-        <!-- Articles text -->
-        <p>{{ article.text|linebreaks }}</p>
-        
-        <!-- Article Likes -->
-        {% with num_of_likes=article.likes.count %}
-        
-        <span id="likes-num">{{ num_of_likes }} Like{{ num_of_likes|pluralize }}</span>
-
-        <form id="like-form">
-            {% csrf_token %}
-            <input type="hidden" class="article_id" name="article_id" value="{{ article.id }}">
-
-            <input id="like-button" type="submit" 
-                value="{% if request.user.writer in article.likes.all %}Unlike{% else %}Like{% endif %}">
-
-        </form>
-        {% endwith %}
-        <div>
-            <h4>Comments</h4>
-
-            <!-- For error message in filling of form. -->
-            {% if messages %}
-                <ul class="messages">
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
+            
+            <br>
+            <!-- Article audio -->
+            {% if article.article_audio and article.display_audio == 'y' %}
+                <audio controls controlsList="nodownload" style="width: 90%; height: 50px; display: block; left: 100px;">
+                    <source src="{{ article.article_audio.url }}" type="audio/mpeg">
+                </audio>
             {% endif %}
+            
+            
+            <!-- Articles text -->
+            <p>{{ article.text|linebreaks }}</p>
+            
+            <br>
+            <hr>
+            <!-- Article Likes -->
+            {% with num_of_likes=article.likes.count %}
 
-            <!-- Form for comments. -->
-            <form action="{% url 'article-comments' article.writer.user article.article_url %}" method="post">
+            <form id="like-form" style="float: left; padding-right: 5px;">
                 {% csrf_token %}
                 <input type="hidden" class="article_id" name="article_id" value="{{ article.id }}">
-                <input type="hidden" name="commenter" value="{{ request.user.writer }}">
 
-                <textarea id="text" name="text" cols="30" rows="5"></textarea><br>
-                <input type="submit" value="Comment">
+                <input id="like-button" type="submit" 
+                    value="{% if request.user.writer in article.likes.all %}Unlike{% else %}Like{% endif %}">
+
             </form>
 
-            <!-- Comments -->
-            {% if article.comment_set.all %}
-            <a href="" onclick="show_comments(); return false" id="show-comments">Open comments</a>
-            <div id="comment-area">
-                {% for comment in article.comment_set.all %}
-                <ul>
-                    <li>
-                        <div>
-                            <small style="font-size: 10px;">{{ comment.commenter }} - {{ comment.date }}</small><br>
-                            <small>{{comment.text}}</small>
+            <span id="likes-num">{{ num_of_likes }} Like{{ num_of_likes|pluralize }}</span>
+            {% endwith %}
+            <div>
+                <h4>Comments</h4>
+                <!-- For error message in filling of form. -->
+                {% if messages %}
+                    <ul class="messages">
+                        {% for message in messages %}
+                            <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
 
-                            <!-- Replies to comments form. -->
-                            <br>
-                            <!-- <button id="show">Reply</button> -->
-                            <a href="" id="show-reply-box" onclick="return false;">Reply</a>
-                            
-                            <form class="reply-box" action="{% url 'article-comments-replies' article.writer.user article.article_url %}" method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="article_id" value="{{ article.id }}">
-                                <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                <!-- Form for comments. -->
+                <form action="{% url 'article-comments' article.writer.user article.article_url %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" class="article_id" name="article_id" value="{{ article.id }}">
+                    <input type="hidden" name="commenter" value="{{ request.user.writer }}">
 
-                                <textarea name="reply_text" style="width: 100px; height: 30px;"></textarea><br>
-                                <input type="submit" value="Reply" style="width: 45px; height: 15px;font-size: 9px; display: inline;">
-                            </form>
+                    <textarea id="text" name="text" cols="30" rows="5"></textarea><br>
+                    <input type="submit" value="Comment">
+                </form>
 
-                            <!-- <button id="cancel-reply">Cancel</button> -->
-                            <a href="" id="cancel-reply" onclick="return false">Cancel</a>
+                <!-- Comments -->
+                {% if article.comment_set.all %}
+                <a href="" onclick="show_comments(); return false" id="show-comments">Open comments</a>
+                <div id="comment-area">
+                    {% for comment in article.comment_set.all %}
+                    <ul>
+                        <li>
+                            <div>
+                                <small style="font-size: 10px;">{{ comment.commenter }} - {{ comment.date }}</small><br>
+                                <small>{{comment.text}}</small>
+
+                                <!-- Replies to comments form. -->
+                                <br>
+                                <!-- <button id="show">Reply</button> -->
+                                <a href="" id="show-reply-box" onclick="return false;">Reply</a>
+                                
+                                <form class="reply-box" action="{% url 'article-comments-replies' article.writer.user article.article_url %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="article_id" value="{{ article.id }}">
+                                    <input type="hidden" name="comment_id" value="{{ comment.id }}">
+
+                                    <textarea name="reply_text" style="width: 100px; height: 30px;"></textarea><br>
+                                    <input type="submit" value="Reply" style="width: 45px; height: 15px;font-size: 9px; display: inline;">
+                                </form>
+
+                                <!-- <button id="cancel-reply">Cancel</button> -->
+                                <a href="" id="cancel-reply" onclick="return false">Cancel</a>
 
 
-                            <!-- Comment replies -->
-                            {% if comment.reply_set.all %}
-                            <br><small>Replies</small>
-                                <ul>
-                                    {% for reply in comment.reply_set.all %}
-                                    <li>
-                                        <small style="font-size: 10px;">{{ reply.replier }} - {{ reply.date }}</small><br>
-                                        <small>{{ reply.reply_text }}</small>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                            <br>
-                        </div>
-                    </li>
-                </ul>
-                {% endfor %}
+                                <!-- Comment replies -->
+                                {% if comment.reply_set.all %}
+                                <br><small>Replies</small>
+                                    <ul>
+                                        {% for reply in comment.reply_set.all %}
+                                        <li>
+                                            <small style="font-size: 10px;">{{ reply.replier }} - {{ reply.date }}</small><br>
+                                            <small>{{ reply.reply_text }}</small>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                                <br>
+                            </div>
+                        </li>
+                    </ul>
+                    {% endfor %}
+                </div>
+                <a href="" onclick="hide_comments(); return false" id="hide-comments">Close comments</a>
+                {% endif %}
             </div>
-            <a href="" onclick="hide_comments(); return false" id="hide-comments">Close comments</a>
+            
+            <!-- More  Articles by Author -->
+            {% if more_article %}
+                <h4>More Articles by {{ article.writer }}</h4>
+                <ul>
+                {% for article in more_article %}
+                    <li><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></li>
+                {% endfor %}
+                </ul>
             {% endif %}
-        </div>
-        
-        <!-- More  Articles by Author -->
-        {% if more_article %}
-            <h4>More Articles by {{ article.writer }}</h4>
-            <ul>
-            {% for article in more_article %}
-                <li><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></li>
-            {% endfor %}
-            </ul>
-        {% endif %}
-    {% endif%}
+        {% endif%}
 
-    <!-- Data values that would be sent to external JavaScript -->
-    <div id="check-authenticaton", data-check_authentication="{{ user.is_authenticated|lower }}"></div>
-    <div id="login-page-redirect" data-login_page_redirect="{% url 'login' %}?next={{ request.path }}"></div>
-    <div id="like-form-url" data-like_form_url="{% url 'like-article' article.writer.user article.article_url %}"></div>
-    <div id="save-form-url" data-save_form_url="{% url 'save-article' article.writer.user article.article_url %}"></div>
-    
+        <!-- Data values that would be sent to external JavaScript -->
+        <div id="check-authenticaton", data-check_authentication="{{ user.is_authenticated|lower }}"></div>
+        <div id="login-page-redirect" data-login_page_redirect="{% url 'login' %}?next={{ request.path }}"></div>
+        <div id="like-form-url" data-like_form_url="{% url 'like-article' article.writer.user article.article_url %}"></div>
+        <div id="save-form-url" data-save_form_url="{% url 'save-article' article.writer.user article.article_url %}"></div>
+    </div>
 {% endblock %}

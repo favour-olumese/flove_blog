@@ -8,6 +8,18 @@
 {% block content %}
 
 <div class="body-content">
+
+<!-- Display notification for user to create writer profile if they are yet to create it. -->
+{% if user != 'AnonymousUser' and user.writer == '' %}
+<div class="info">
+    <span>
+        Please, kindly create your 
+        <a href="{% url 'new-writer' %}" style="text-decoration: underline;">writer profile</a> 
+        to have full access to features.
+    </span>
+</div>
+{% endif %}
+
 {% for article in article_list %}
     <div style="border: 1px solid; padding: 20px; border-radius: 20px;">
         <div>

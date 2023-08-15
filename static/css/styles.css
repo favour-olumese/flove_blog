@@ -86,3 +86,24 @@ a:hover {
     padding: 10px;
     border-radius: 10px;
 }
+
+/* For the Messaging Framework */
+.messages {
+    width: 75%
+}
+
+.info {
+    background-color: #d4edda;
+    color: #60926b;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+}
+
+.error {
+    background-color: #f8d7da;
+    color: #a7676c;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+}

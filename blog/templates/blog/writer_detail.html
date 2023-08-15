@@ -83,55 +83,49 @@
         </form>
         <br>
     {% endif %}
-
-    {% if user != 'AnonymousUser' and user.writer == '' %}
-        <p>Please, kindly create your writer profile to fully access this page.</p>
-        <a href="{% url 'new-writer' %}"><button>Create Writer Profile</button></a>
-
-    {% else %}
     
-        {% for article in article_list %}
+    {% for article in article_list %}
 
-            <!-- Ensures that only user can see unlisted articles -->
-            {% if article.article_status == 'u' and request.user.writer != article.writer %}
-                <div></div>
-            
-            {% else %}
-                <div style="border: 0.5px solid; padding: 20px; border-radius: 20px;">
-                    <a href="{{ article.get_absolute_url }}">
-                        {% if article.article_img %}
-                            <img src="{{ article.article_img.url }}" alt="" style="width: 30%; float: right; border-radius: 30px;">
-                        {% endif %}
-                        <div style="width: 60%;" >
-                            <h3>{{ article.title }}</h3>
-                            <p>{{ article.text|truncatechars_html:150 }}</p>
-                            <small>{{ article.get_article_status_display }}</small>
-                        </div>
-                    </a>
-
-                    <!-- Save/Unsave Article -->
-                    <form class="save-form">
-                        {% csrf_token %}
-                        <input class="article_id" type="hidden" name="article_id" value="{{ article.id }}">
-
-                        <input id="save-button" type="submit"
-                        value="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
-
-                        <div id="save-form-url" data-save_form_url="{% url 'save-article' article.writer.user article.article_url %}"></div>
-                    </form>
-
-                    {% if request.user == article.writer.user %}
-                        <a href="{% url 'update-article' article.writer.user article.article_url %}">Update</a>
-                        <a href="{% url 'delete-article' article.writer.user article.article_url %}">Delete</a>
+        <!-- Ensures that only user can see unlisted articles -->
+        {% if article.article_status == 'u' and request.user.writer != article.writer %}
+            <div></div>
+        
+        {% else %}
+            <div style="border: 0.5px solid; padding: 20px; border-radius: 20px;">
+                <a href="{{ article.get_absolute_url }}">
+                    {% if article.article_img %}
+                        <img src="{{ article.article_img.url }}" alt="" style="width: 30%; float: right; border-radius: 30px;">
                     {% endif %}
-                </div>
-                <hr>
-            {% endif %}
+                    <div style="width: 60%;" >
+                        <h3>{{ article.title }}</h3>
+                        <p>{{ article.text|truncatechars_html:150 }}</p>
+                        <small>{{ article.get_article_status_display }}</small>
+                    </div>
+                </a>
 
-        {% empty %}
-        <p>There are no articles</p>
-        {% endfor %}
-    {% endif %}
+                <!-- Save/Unsave Article -->
+                <form class="save-form">
+                    {% csrf_token %}
+                    <input class="article_id" type="hidden" name="article_id" value="{{ article.id }}">
+
+                    <input id="save-button" type="submit"
+                    value="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
+
+                    <div id="save-form-url" data-save_form_url="{% url 'save-article' article.writer.user article.article_url %}"></div>
+                </form>
+
+                {% if request.user == article.writer.user %}
+                    <a href="{% url 'update-article' article.writer.user article.article_url %}">Update</a>
+                    <a href="{% url 'delete-article' article.writer.user article.article_url %}">Delete</a>
+                {% endif %}
+            </div>
+            <hr>
+        {% endif %}
+
+    {% empty %}
+    <p>There are no articles</p>
+    {% endfor %}
+
     </div>
     <div id="check-authenticaton", data-check_authentication="{{ user.is_authenticated|lower }}"></div>
     <div id="login-page-redirect" data-login_page_redirect="{% url 'login' %}?next={{ request.path }}"></div>
