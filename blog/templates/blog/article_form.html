@@ -15,11 +15,13 @@
 {% endblock %}
 
 {% block content %}
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Publish">
-    </form>
+    <div class="body-content">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Publish">
+        </form>
+    </div>
     <!-- TODO: Implement an function to change value of submit button
     to Save when draft is chosen. -->
 {% endblock %}
