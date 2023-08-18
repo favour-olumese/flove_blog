@@ -2,7 +2,14 @@
 {% load app_tags %}
 
 {% block title %}
-    <title>Articles | Flove</title>
+    <!-- Alternate between title for saved articles and all articles. -->
+    {% url 'saved-articles' as saved_articles %}
+    <title>
+        {% if request.path == saved_articles %}
+        Saved 
+        {% endif %}
+        Articles | Flove
+    </title>
 {% endblock %}
 
 {% block content %}
@@ -18,6 +25,12 @@
         to have full access to features.
     </span>
 </div>
+{% endif %}
+
+<!-- Displays when page queryset is the list of writer's saved articles -->
+{% url 'saved-articles' as saved_articles %}
+{% if request.path == saved_articles %}
+    <h1>Saved Articles</h1>
 {% endif %}
 
 {% for article in article_list %}

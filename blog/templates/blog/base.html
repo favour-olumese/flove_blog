@@ -81,8 +81,14 @@
                         <a href="{% url 'writer' user %}">
                             <li>My stories</li>
                         </a>
+
+                        <hr>
+                        
+                        <a href="{% url 'saved-articles' %}">
+                            <li>Saved stories</li>
+                        </a>
                     {% endif %}
-                    
+
                     <hr>
                     <a href="{% url 'logout' %}">
                         <li>Sign out</li>

@@ -96,14 +96,28 @@ class ArticleListView(ListView):
     queryset = Article.objects.filter(article_status='p')
 
     def get_queryset(self, **kwargs):
+        """Handles query set for both all articles and viewing saved articles.
+        
+        - If request is for all articles, it displays all public articles,
+        else, if it is for saved articles, articles saved by 
+        requesting user are displayed
+        - To access saved articles, user must be logged in. This is handled
+        in the urls.py file
+        """
         queryset = super().get_queryset()
 
         current_url = self.request.path
         if current_url == reverse('articles'):
             queryset = queryset
+
+        # Queryset for saved articles
         elif current_url == reverse('saved-articles'):
-            # Queryset for saved articles
-            queryset = Writer.objects.get(id=self.request.user.writer.id).saved_articles.all()
+
+            # Check if users has created their writer profile.
+            if hasattr(self.request.user, 'writer'):
+                queryset = Writer.objects.get(id=self.request.user.writer.id).saved_articles.all()
+            else:
+                return
 
         return queryset
 
