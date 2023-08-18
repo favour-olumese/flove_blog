@@ -149,3 +149,14 @@ $(document).on('submit', '.save-form', function(event){
         },
     });
 });
+
+// Cancel the deletion of an article
+$('.delete-cancel-button').on("click", function(event) {
+    /*
+    * Cancels the deletion of an article and redirects to the article page.
+    */
+
+    var articlePageUrl = $('#cancel-delete-redirect-to-article').data('cancel_delete_redirect_to_article');
+    window.location = articlePageUrl;
+    return false;
+});

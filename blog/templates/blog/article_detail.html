@@ -93,9 +93,9 @@
                 <img src="{{ article.article_img.url }}" alt="" style="width: 90%;">
             {% endif %}
             
-            <br>
             <!-- Article audio -->
             {% if article.article_audio and article.display_audio == 'y' %}
+                <br>
                 <audio controls controlsList="nodownload" style="width: 90%; height: 50px; display: block; left: 100px;">
                     <source src="{{ article.article_audio.url }}" type="audio/mpeg">
                 </audio>
@@ -105,7 +105,6 @@
             <!-- Articles text -->
             <p>{{ article.text|linebreaks }}</p>
             
-            <br>
             <hr>
             <!-- Article Likes -->
             {% with num_of_likes=article.likes.count %}

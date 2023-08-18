@@ -5,12 +5,19 @@
 {% endblock %}
 
 {% block content %}
-    <form method="post">
-        {% csrf_token %}
-        Are you sure you want to delete <strong>{{ article.title }}</strong>.
-        {{ form }}
-        <br>
-        <input type="submit" value="Yes">
-        <!-- <input value="Cancel" > -->
-    </form>
+
+    <div class="body-content">
+        <form method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to delete <strong>{{ article.title }}</strong>.</p>
+            {{ form }}
+
+            <input type="submit" value="Yes">
+            <input type="submit" class="delete-cancel-button" value="Cancel">
+        </form>
+    </div>
+
+    <!-- Data value that would be sent to external JavaScript to cancel delete -->
+    <div id="cancel-delete-redirect-to-article", data-cancel_delete_redirect_to_article="{% url 'article-detail' article.writer.user article.article_url %}"></div>
 {% endblock %}
+
