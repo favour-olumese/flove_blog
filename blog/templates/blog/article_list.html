@@ -34,7 +34,7 @@
 {% endif %}
 
 {% for article in article_list %}
-    <div style="border: 1px solid; padding: 20px; border-radius: 20px;">
+    <div class="article-card" style="border: 1px solid; padding: 20px; border-radius: 20px;">
         <div>
             <a href="{{ article.writer.get_absolute_url }}">
                 
@@ -53,9 +53,9 @@
         </div>
         <a href="{{ article.get_absolute_url }}">
             {% if article.article_img %}
-                <img src="{{ article.article_img.url }}" alt="" style="width: 30%; float: right; border-radius: 30px;">
+                <img src="{{ article.article_img.url }}" alt="" class="article-card-image" style="width: 30%; float: right; border-radius: 30px;">
             {% endif %}
-            <div style="width: 60%;" >
+            <div class="article-card-text" style="width: 60%;" >
                 <h3>{{ article.title }}</h3>
                 <p>{{ article.text|truncatechars_html:150 }}</p>
                 <small>{{ article.get_article_status_display }}</small>

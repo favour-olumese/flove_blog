@@ -191,16 +191,31 @@
                 <a href="" onclick="hide_comments(); return false" id="hide-comments">Close comments</a>
                 {% endif %}
             </div>
-            
-            <!-- More  Articles by Author -->
+
+            <hr>
+
+            <!-- Three More Articles by Author -->
             {% if more_article %}
-                <h4>More Articles by {{ article.writer }}</h4>
-                <ul>
-                {% for article in more_article %}
-                    <li><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></li>
-                {% endfor %}
-                </ul>
+                <h3>More Articles by {{ article.writer }}</h3>
+
+                    {% for article in more_article %}
+                    <div class="article-card" style="border: 1px solid; padding: 20px; border-radius: 20px;">
+                        <a href="{{ article.get_absolute_url }}">
+                            {% if article.article_img %}
+                                <img src="{{ article.article_img.url }}" alt="" class="article-card-image" style="width: 30%; float: right; border-radius: 30px;">
+                            {% endif %}
+                            <div class="article-card-text" style="width: 60%;">
+                                <h3>{{ article.title }}</h3>
+                                <p>{{ article.text|truncatechars_html:150 }}</p>
+                                <small>{{ article.get_article_status_display }}</small>
+                            </div>
+                        </a>
+                    </div>
+                    <hr>
+                    {% endfor %}
+
             {% endif %}
+
         {% endif%}
 
         <!-- Data values that would be sent to external JavaScript -->
