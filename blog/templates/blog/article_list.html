@@ -67,15 +67,16 @@
             {% csrf_token %}
             <input class="article_id" type="hidden" name="article_id" value="{{ article.id }}">
 
-            <input id="save-button" type="submit"
-            value="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
+            <input id="save-button" type="submit" style="font-family: FontAwesome; float: left;"
+                    value="{% if article in request.user.writer.saved_articles.all %}&#xf02e;{% else %}&#xf097;{% endif %}"
+                    title="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
 
             <div id="save-form-url" data-save_form_url="{% url 'save-article' article.writer.user article.article_url %}"></div>
         </form>
 
         {% if request.user.writer.id == article.writer.id %}
-            <a href="{% url 'update-article' article.writer.user article.article_url %}">Update</a>
-            <a href="{% url 'delete-article' article.writer.user article.article_url %}">Delete</a>
+        <a href="{% url 'update-article' article.writer.user article.article_url %}" title="Edit"><i class="fa-solid fa-pen-nib"></i></a>
+        <a href="{% url 'delete-article' article.writer.user article.article_url %}" title="Delete"><i class="fa-solid fa-trash"></i></a>
         {% endif %}
     </div>
     <hr>

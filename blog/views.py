@@ -360,10 +360,12 @@ def article_likes(request, username, article_url):
 
             if article.likes.filter(id=request.user.writer.id).exists():
                 article.likes.remove(request.user.writer)
-                button_value = 'Like'
+                button_value = '[\uf087'
+                title_value = 'Like'
             else:
                 article.likes.add(request.user.writer)
-                button_value = 'Unlike'
+                button_value = '[\uf164'
+                title_value = 'Unlike'
             
             article_likes = article.likes.count()
             status = 200
@@ -372,6 +374,7 @@ def article_likes(request, username, article_url):
                 'article_likes': article_likes,
                 'status': status,
                 'button_value': button_value,
+                'title_value': title_value,
             }
 
         # Redirects users yet to create a writer profile to create one.
@@ -420,16 +423,19 @@ def save_article(request, username, article_url):
 
             if writer.saved_articles.filter(id=article_id).exists():
                 writer.saved_articles.remove(article_id)
-                button_value = 'Save'
+                button_value = '\uf097'
+                title_value = 'Save'
             else:
                 writer.saved_articles.add(article_id)
-                button_value = 'Unsave'
+                button_value = '\uf02e'
+                title_value = 'Unsave'
 
             status = 200
 
             context = {
                 'button_value': button_value,
                 'status': status,
+                'title_value': title_value,
             }
 
         # Redirects users yet to create a writer profile to create one.

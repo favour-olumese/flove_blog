@@ -13,7 +13,7 @@
         <div class="info">
             <span>
                 Please, kindly create your 
-                <a href="{% url 'new-writer' %}" style="text-decoration: underline;">writer profile</a> 
+                <a href="{% url 'new-writer' %}" class="underline-anchor">writer profile</a> 
                 to have full access to features.
             </span>
         </div>
@@ -38,7 +38,7 @@
                     "
     
                     alt="{{ article.writer }}"
-                    style="width: 50px; border-radius: 30px; float: left; margin-right: 10px;">
+                    class="header-writer-image">
                     <small>{{ article.writer }}</small>
                 </a>
             </div>
@@ -70,8 +70,8 @@
             <span style="float: right; padding-left: 4px;">
 
                 {% if request.user.writer.id == article.writer.id %}
-                    <a href="{% url 'update-article' article.writer.user article.article_url %}"><button type="button">Update</button></a>
-                    <a href="{% url 'delete-article' article.writer.user article.article_url %}"><button type="button">Delete</button></a>
+                    <a href="{% url 'update-article' article.writer.user article.article_url %}" title="Edit"><i class="fa-solid fa-pen-nib"></i></a>
+                    <a href="{% url 'delete-article' article.writer.user article.article_url %}" title="Delete"><i class="fa-solid fa-trash"></i></a>
                 {% endif %}
             </span>
             <span style="float: right;">
@@ -80,8 +80,9 @@
                     {% csrf_token %}
                     <input type="hidden" name="article_id" value="{{ article.id }}">
 
-                    <input id="save-button" type="submit"
-                    value="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
+                    <input id="save-button" type="submit" style="font-family: FontAwesome"
+                    value="{% if article in request.user.writer.saved_articles.all %}&#xf02e;{% else %}&#xf097;{% endif %}"
+                    title="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
                 </form>
             </span>
             <hr>
@@ -113,8 +114,9 @@
                 {% csrf_token %}
                 <input type="hidden" class="article_id" name="article_id" value="{{ article.id }}">
 
-                <input id="like-button" type="submit" 
-                    value="{% if request.user.writer in article.likes.all %}Unlike{% else %}Like{% endif %}">
+                <input id="like-button"  style="font-family: FontAwesome" type="submit" 
+                    value="{% if request.user.writer in article.likes.all %}[&#xf164;{% else %}[&#xf087;{% endif %}"
+                    title="{% if request.user.writer in article.likes.all %}Unlike{% else %}Like{% endif %}">
 
             </form>
 
@@ -149,7 +151,15 @@
                     <ul>
                         <li>
                             <div>
-                                <small style="font-size: 10px;">{{ comment.commenter }} - {{ comment.date }}</small><br>
+                                <a href="{{ comment.commenter.get_absolute_url }}">
+                                    <img src="{% if comment.commenter.profile_picture %}
+                                    {{ comment.commenter.profile_picture.url }}
+                                    {% else %}
+                                    {{ comment.commenter.user|gravatar }}
+                                    {% endif %}"
+                                    alt="" class="comment-image">
+                                    <small style="font-size: 10px;">{{ comment.commenter }} - {{ comment.date }}</small><br>
+                                </a>
                                 <small>{{comment.text}}</small>
 
                                 <!-- Replies to comments form. -->
@@ -163,28 +173,34 @@
                                     <input type="hidden" name="comment_id" value="{{ comment.id }}">
 
                                     <textarea name="reply_text" style="width: 100px; height: 30px;"></textarea><br>
-                                    <input type="submit" value="Reply" style="width: 45px; height: 15px;font-size: 9px; display: inline;">
+                                    <input type="submit" value="Reply" style="width: 45px; height: 15px; font-size: 9px;">
+                                    <input type="submit"  id="cancel-reply" onclick="return false" value="Cancel" style="width: 45px; height: 15px; font-size: 9px;">
                                 </form>
-
-                                <!-- <button id="cancel-reply">Cancel</button> -->
-                                <a href="" id="cancel-reply" onclick="return false">Cancel</a>
-
 
                                 <!-- Comment replies -->
                                 {% if comment.reply_set.all %}
-                                <br><small>Replies</small>
-                                    <ul>
+                                    <ul style="padding-left: 20px;">
                                         {% for reply in comment.reply_set.all %}
                                         <li>
-                                            <small style="font-size: 10px;">{{ reply.replier }} - {{ reply.date }}</small><br>
+                                            <a href="{{ reply.replier.get_absolute_url }}">
+                                                <img src="{% if comment.commenter.profile_picture %}
+                                                {{ reply.replier.profile_picture.url }}
+                                                {% else %}
+                                                {{ reply.replier.user|gravatar }}
+                                                {% endif %}"
+                                                alt="" class="reply-image">
+                                                <small style="font-size: 10px;">{{ reply.replier }} - {{ reply.date }}</small><br>
+                                            </a>
+                                            
                                             <small>{{ reply.reply_text }}</small>
                                         </li>
+                                        <hr>
                                         {% endfor %}
                                     </ul>
                                 {% endif %}
-                                <br>
                             </div>
                         </li>
+                        <hr>
                     </ul>
                     {% endfor %}
                 </div>
@@ -199,12 +215,12 @@
                 <h3>More Articles by {{ article.writer }}</h3>
 
                     {% for article in more_article %}
-                    <div class="article-card" style="border: 1px solid; padding: 20px; border-radius: 20px;">
+                    <div class="article-card">
                         <a href="{{ article.get_absolute_url }}">
                             {% if article.article_img %}
-                                <img src="{{ article.article_img.url }}" alt="" class="article-card-image" style="width: 30%; float: right; border-radius: 30px;">
+                                <img src="{{ article.article_img.url }}" alt="" class="article-card-image">
                             {% endif %}
-                            <div class="article-card-text" style="width: 60%;">
+                            <div class="article-card-text">
                                 <h3>{{ article.title }}</h3>
                                 <p>{{ article.text|truncatechars_html:150 }}</p>
                                 <small>{{ article.get_article_status_display }}</small>

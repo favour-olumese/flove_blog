@@ -12,8 +12,17 @@ a {
     color: black;
 }
 
+.underline-anchor {
+    text-decoration: underline;
+}
+
 a:hover {
     color: blue;
+}
+
+#like-button:hover, #save-button:hover {
+    color: blue;
+    cursor: pointer;
 }
 
 /* Navigation Bar */
@@ -78,6 +87,30 @@ a:hover {
 }
 
 
+/* Article Detail Page */
+.header-writer-image {
+    width: 50px;
+    border-radius: 30px;
+    float: left;
+    margin-right: 10px;
+}
+
+.article-card {
+    border: 1px solid;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.article-card-image {
+    width: 30%;
+    float: right;
+    border-radius: 30px;
+}
+
+.article-card-text {
+    width: 60%;
+}
+
 /* Register Form */
 .register-form {
     margin: auto;
@@ -87,6 +120,15 @@ a:hover {
     border-radius: 10px;
 }
 
+/* Comments section */
+#comment-area {
+    width: 50%;
+}
+
+.comment-image .reply-image{
+    width: 10px;
+    border-radius: 50px;
+}
 /* For the Messaging Framework */
 .messages {
     width: 75%

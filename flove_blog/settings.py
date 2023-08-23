@@ -49,8 +49,6 @@ INSTALLED_APPS = [
     'django_email_verification',
     # For cleaning up media files when associated Model fields are deleted.
     'django_cleanup.apps.CleanupConfig',
-    # Font Awesome Fonts
-    'fontawesomefree',
 ]
 
 MIDDLEWARE = [
