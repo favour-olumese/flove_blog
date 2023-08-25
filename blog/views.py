@@ -294,17 +294,20 @@ class ArticleDeleteView(LoginRequiredMixin, DeleteView):
     """View for deleting articles."""
 
     model = Article
-    success_url = reverse_lazy('articles')
     slug_url_kwarg = 'article_url'
     slug_url_kwarg2 = 'username'
 
     def  get_object(self, queryset=None):
-        """Function to assign article_url of the Article model to the url kwarg."""
+        """Assigns article_url of the Article model to the url kwarg."""
 
         article_url =self.kwargs.get(self.slug_url_kwarg)
         user_name = self.kwargs.get(self.slug_url_kwarg2)
 
         return get_object_or_404(self.model, article_url=article_url)
+    
+    def get_success_url(self):
+        """Redirects users to their page after they delete an article."""
+        return reverse_lazy('writer', args=(self.request.user,))
 
 
 @login_required
