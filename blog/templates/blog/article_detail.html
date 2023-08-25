@@ -147,62 +147,64 @@
                 {% if article.comment_set.all %}
                 <a href="" onclick="show_comments(); return false" id="show-comments">Open comments</a>
                 <div id="comment-area">
-                    {% for comment in article.comment_set.all %}
-                    <ul>
-                        <li>
-                            <div>
-                                <a href="{{ comment.commenter.get_absolute_url }}">
-                                    <img src="{% if comment.commenter.profile_picture %}
-                                    {{ comment.commenter.profile_picture.url }}
-                                    {% else %}
-                                    {{ comment.commenter.user|gravatar }}
-                                    {% endif %}"
-                                    alt="" class="comment-image">
-                                    <small style="font-size: 10px;">{{ comment.commenter }} - {{ comment.date }}</small><br>
-                                </a>
-                                <small>{{comment.text}}</small>
+                    <div id="comment-area-body">
+                        {% for comment in article.comment_set.all %}
+                        <ul>
+                            <li>
+                                <div>
+                                    <a href="{{ comment.commenter.get_absolute_url }}">
+                                        <img src="{% if comment.commenter.profile_picture %}
+                                        {{ comment.commenter.profile_picture.url }}
+                                        {% else %}
+                                        {{ comment.commenter.user|gravatar }}
+                                        {% endif %}"
+                                        alt="" class="comment-image">
+                                        <small style="font-size: 10px;">{{ comment.commenter }} - {{ comment.date }}</small><br>
+                                    </a>
+                                    <small>{{comment.text}}</small>
 
-                                <!-- Replies to comments form. -->
-                                <br>
-                                <!-- <button id="show">Reply</button> -->
-                                <a href="" id="show-reply-box" onclick="return false;">Reply</a>
-                                
-                                <form class="reply-box" action="{% url 'article-comments-replies' article.writer.user article.article_url %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="article_id" value="{{ article.id }}">
-                                    <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                                    <!-- Replies to comments form. -->
+                                    <br>
+                                    <!-- <button id="show">Reply</button> -->
+                                    <a href="" id="show-reply-box" onclick="return false;">Reply</a>
+                                    
+                                    <form class="reply-box" action="{% url 'article-comments-replies' article.writer.user article.article_url %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="article_id" value="{{ article.id }}">
+                                        <input type="hidden" name="comment_id" value="{{ comment.id }}">
 
-                                    <textarea name="reply_text" style="width: 100px; height: 30px;"></textarea><br>
-                                    <input type="submit" value="Reply" style="width: 45px; height: 15px; font-size: 9px;">
-                                    <input type="submit"  id="cancel-reply" onclick="return false" value="Cancel" style="width: 45px; height: 15px; font-size: 9px;">
-                                </form>
+                                        <textarea name="reply_text" style="width: 100px; height: 30px;"></textarea><br>
+                                        <input type="submit" value="Reply" style="width: 45px; height: 15px; font-size: 9px;">
+                                        <input type="submit"  id="cancel-reply" onclick="return false" value="Cancel" style="width: 45px; height: 15px; font-size: 9px;">
+                                    </form>
 
-                                <!-- Comment replies -->
-                                {% if comment.reply_set.all %}
-                                    <ul style="padding-left: 20px;">
-                                        {% for reply in comment.reply_set.all %}
-                                        <li>
-                                            <a href="{{ reply.replier.get_absolute_url }}">
-                                                <img src="{% if comment.commenter.profile_picture %}
-                                                {{ reply.replier.profile_picture.url }}
-                                                {% else %}
-                                                {{ reply.replier.user|gravatar }}
-                                                {% endif %}"
-                                                alt="" class="reply-image">
-                                                <small style="font-size: 10px;">{{ reply.replier }} - {{ reply.date }}</small><br>
-                                            </a>
-                                            
-                                            <small>{{ reply.reply_text }}</small>
-                                        </li>
-                                        <hr>
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-                            </div>
-                        </li>
-                        <hr>
-                    </ul>
-                    {% endfor %}
+                                    <!-- Comment replies -->
+                                    {% if comment.reply_set.all %}
+                                        <ul style="padding-left: 20px;">
+                                            {% for reply in comment.reply_set.all %}
+                                            <li>
+                                                <a href="{{ reply.replier.get_absolute_url }}">
+                                                    <img src="{% if comment.commenter.profile_picture %}
+                                                    {{ reply.replier.profile_picture.url }}
+                                                    {% else %}
+                                                    {{ reply.replier.user|gravatar }}
+                                                    {% endif %}"
+                                                    alt="" class="reply-image">
+                                                    <small style="font-size: 10px;">{{ reply.replier }} - {{ reply.date }}</small><br>
+                                                </a>
+                                                
+                                                <small>{{ reply.reply_text }}</small>
+                                            </li>
+                                            <hr>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            </li>
+                            <hr>
+                        </ul>
+                        {% endfor %}
+                    </div>
                 </div>
                 <a href="" onclick="hide_comments(); return false" id="hide-comments">Close comments</a>
                 {% endif %}

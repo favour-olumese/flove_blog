@@ -60,6 +60,8 @@ a:hover {
     cursor: pointer;
 }
 
+/* COMMENTS AND REPLIES */
+
 /* Hide reply box, would be activated using JavaScript */
 .reply-box {
     display: none;
@@ -74,6 +76,29 @@ a:hover {
 #comment-area, #hide-comments {
     display: none;
 }
+
+#comment-area {
+    padding: 10px;
+    min-height: 120px;
+    max-height: 400px;
+    overflow: auto; 
+    width: 80%;
+    border-radius: 30px;
+    margin: 5px 0;
+}
+
+.comment-area-body {
+    padding: 10px;
+    border-radius: 30px;
+    border: 1px solid saddlebrown;
+    margin: 20px 0;
+}
+
+.comment-image, .reply-image {
+    width: 10px;
+    border-radius: 50px;
+}
+
 
 /* Buttons for hiding and showing  comments */
 #show-reply-box, #cancel-reply {
@@ -135,15 +160,6 @@ a:hover {
     border-radius: 10px;
 }
 
-/* Comments section */
-#comment-area {
-    width: 50%;
-}
-
-.comment-image .reply-image{
-    width: 10px;
-    border-radius: 50px;
-}
 /* For the Messaging Framework */
 .messages {
     width: 75%
