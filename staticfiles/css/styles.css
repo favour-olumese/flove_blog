@@ -26,11 +26,12 @@ a:hover {
 }
 
 .body-section {
-    min-height: calc(100vh - 100px);
+    min-height: calc(100vh - 180px);
 }
 
 .footer-section {
     height: 100px;
+    margin-top: 80px;
     background-color: rgb(224, 224, 224);
 }
 
@@ -87,7 +88,7 @@ a:hover {
     margin: 5px 0;
 }
 
-.comment-area-body {
+#comment-area-body {
     padding: 10px;
     border-radius: 30px;
     border: 1px solid saddlebrown;

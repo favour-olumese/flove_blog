@@ -87,21 +87,20 @@
             </span>
             <hr>
 
-        
-            
-            {% if article.article_img %}
-                <br>
-                <img src="{{ article.article_img.url }}" alt="" style="width: 90%;">
-            {% endif %}
-            
-            <!-- Article audio -->
-            {% if article.article_audio and article.display_audio == 'y' %}
-                <br>
-                <audio controls controlsList="nodownload" style="width: 90%; height: 50px; display: block; left: 100px;">
-                    <source src="{{ article.article_audio.url }}" type="audio/mpeg">
-                </audio>
-            {% endif %}
-            
+            <div style="border: 1px solid saddlebrown; align-items: center;">
+                {% if article.article_img %}
+                    <br>
+                    <img src="{{ article.article_img.url }}" alt="" style="width: 90%;">
+                {% endif %}
+                
+                <!-- Article audio -->
+                {% if article.article_audio and article.display_audio == 'y' %}
+                    <br>
+                    <audio controls controlsList="nodownload" style="width: 90%; height: 50px; display: block;">
+                        <source src="{{ article.article_audio.url }}" type="audio/mpeg">
+                    </audio>
+                {% endif %}
+            </div>
             
             <!-- Articles text -->
             <p>{{ article.text|linebreaks }}</p>
@@ -159,8 +158,17 @@
                                         {{ comment.commenter.user|gravatar }}
                                         {% endif %}"
                                         alt="" class="comment-image">
-                                        <small style="font-size: 10px;">{{ comment.commenter }} - {{ comment.date }}</small><br>
+                                        <small style="font-size: 10px;">{{ comment.commenter }} - {{ comment.date }}</small>
                                     </a>
+
+                                    <!-- Delete comment -->
+                                    {% if comment.commenter.user == request.user %}
+                                    <a href="{% url 'delete-comment' comment.article.writer.user article.article_url comment.id %}" title="Delete">
+                                        <i class="fa-solid fa-trash fa-2xs"></i>
+                                    </a>
+                                    {% endif %}
+                                    <br>
+
                                     <small>{{comment.text}}</small>
 
                                     <!-- Replies to comments form. -->
@@ -190,9 +198,16 @@
                                                     {{ reply.replier.user|gravatar }}
                                                     {% endif %}"
                                                     alt="" class="reply-image">
-                                                    <small style="font-size: 10px;">{{ reply.replier }} - {{ reply.date }}</small><br>
+                                                    <small style="font-size: 10px;">{{ reply.replier }} - {{ reply.date }}</small>
                                                 </a>
                                                 
+                                                <!-- Delete comment reply -->
+                                                {% if reply.replier.user == request.user %}
+                                                <a href="{% url 'delete-reply' reply.article.writer.user article.article_url reply.id %}" title="Delete">
+                                                    <i class="fa-solid fa-trash fa-2xs"></i>
+                                                </a>
+                                                {% endif %}
+                                                <br>
                                                 <small>{{ reply.reply_text }}</small>
                                             </li>
                                             <hr>

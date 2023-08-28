@@ -100,8 +100,8 @@ class Reply(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        """Orders replies based on recently published."""
-        ordering = ['-date']
+        """Orders replies based on ascending of order of published date."""
+        ordering = ['date']
 
     def __str__(self):
         """Returns string name"""

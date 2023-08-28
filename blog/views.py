@@ -251,7 +251,10 @@ class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         By default, test_func redirects user who do not own the article to the 403 page.
         """
         
-        return redirect(reverse_lazy('article-detail', kwargs={'article_url':str(self.kwargs['article_url']), 'username':str(self.kwargs['username'])}))
+        return redirect(reverse_lazy(
+                        'article-detail',
+                        kwargs={'article_url':str(self.kwargs['article_url']),
+                                'username':str(self.kwargs['username'])}))
     
     def form_valid(self, form):
         """Update article audio file."""
@@ -290,7 +293,7 @@ class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return get_object_or_404(self.model, article_url=article_url)
 
 
-class ArticleDeleteView(LoginRequiredMixin, DeleteView):
+class ArticleDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """View for deleting articles."""
 
     model = Article
@@ -308,6 +311,27 @@ class ArticleDeleteView(LoginRequiredMixin, DeleteView):
     def get_success_url(self):
         """Redirects users to their page after they delete an article."""
         return reverse_lazy('writer', args=(self.request.user,))
+
+    def test_func(self):
+        """"Works with UserPassesTestMixin.
+
+        Returns True when current user is the article onwer;
+        but returns False when current user is not the article onwer.
+        """
+
+        article = Article.objects.filter(article_url=self.kwargs['article_url'])[0]
+        return article.writer.user == self.request.user
+
+    def handle_no_permission(self, *kwargs):
+        """Redirect current user who is not article owner to the article page.
+
+        By default, test_func redirects user who do not own the article to the 403 page.
+        """
+        
+        return redirect(reverse_lazy(
+                        'article-detail',
+                        kwargs={'article_url':str(self.kwargs['article_url']),
+                                'username':str(self.kwargs['username'])}))
 
 
 @login_required
@@ -611,6 +635,40 @@ def comment(request, username, article_url):
     return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))
 
 
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """Deleting user's comment."""
+
+    model = Comment
+
+    def test_func(self):
+        """"Works with UserPassesTestMixin.
+
+        Returns True when current user is the article onwer;
+        but returns False when current user is not the article onwer.
+        """
+
+        article = Article.objects.filter(article_url=self.kwargs['article_url'])[0]
+        comment = Comment.objects.filter(article=article).get(id=self.kwargs['pk'])
+        return comment.commenter.user == self.request.user
+
+    def handle_no_permission(self, *kwargs):
+        """Redirect current user who is not article owner to the article page.
+
+        By default, test_func redirects user who do not own the article to the 403 page.
+        """
+        
+        return redirect(reverse_lazy(
+                        'article-detail',
+                        kwargs={'article_url':str(self.kwargs['article_url']),
+                                'username':str(self.kwargs['username'])}))
+
+    def get_success_url(self):
+        """Redirects users to their article page after they delete their comment."""
+        return reverse_lazy('article-detail',
+                            kwargs={'article_url':self.kwargs['article_url'],
+                                    'username':self.kwargs['username']})
+
+
 @login_required()
 def reply(request, username, article_url):
     """Function for replying to comments.
@@ -662,3 +720,37 @@ def reply(request, username, article_url):
             return HttpResponseRedirect(reverse_lazy('new-writer'))
 
     return HttpResponseRedirect(reverse('article-detail', args=(username, article_url)))
+
+
+class ReplyDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """Delete a user's reply."""
+
+    model = Reply
+
+    def test_func(self):
+        """"Works with UserPassesTestMixin.
+
+        Returns True when current user is the article onwer;
+        but returns False when current user is not the article onwer.
+        """
+
+        article = Article.objects.filter(article_url=self.kwargs['article_url'])[0]
+        reply = Reply.objects.filter(article=article).get(id=self.kwargs['pk'])
+        return reply.replier.user == self.request.user
+
+    def handle_no_permission(self, *kwargs):
+        """Redirect current user who is not article owner to the article page.
+
+        By default, test_func redirects user who do not own the article to the 403 page.
+        """
+        
+        return redirect(reverse_lazy(
+                        'article-detail',
+                        kwargs={'article_url':str(self.kwargs['article_url']),
+                                'username':str(self.kwargs['username'])}))
+
+    def get_success_url(self):
+        """Redirects users to their article page after they delete their comment."""
+        return reverse_lazy('article-detail',
+                            kwargs={'article_url':self.kwargs['article_url'],
+                                    'username':self.kwargs['username']})

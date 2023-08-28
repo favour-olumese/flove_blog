@@ -34,7 +34,7 @@
 {% endif %}
 
 {% for article in article_list %}
-    <div class="article-card" style="border: 1px solid; padding: 20px; border-radius: 20px;">
+    <div class="article-card" style="border: 1px solid; padding: 10px 20px 33px 20px; border-radius: 20px;">
         <div>
             <a href="{{ article.writer.get_absolute_url }}">
                 
@@ -75,8 +75,8 @@
         </form>
 
         {% if request.user.writer.id == article.writer.id %}
-        <a href="{% url 'update-article' article.writer.user article.article_url %}" title="Edit"><i class="fa-solid fa-pen-nib"></i></a>
-        <a href="{% url 'delete-article' article.writer.user article.article_url %}" title="Delete"><i class="fa-solid fa-trash"></i></a>
+        <a href="{% url 'update-article' article.writer.user article.article_url %}" title="Edit" style="margin-left: 4px;"><i class="fa-solid fa-pen-nib"></i></a>
+        <a href="{% url 'delete-article' article.writer.user article.article_url %}" title="Delete" style="margin-left: 4px;"><i class="fa-solid fa-trash"></i></a>
         {% endif %}
     </div>
     <hr>
