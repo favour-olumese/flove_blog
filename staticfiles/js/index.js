@@ -162,3 +162,31 @@ $('.delete-cancel-button').on("click", function(event) {
     window.location = articlePageUrl;
     return false;
 });
+
+
+// HANDLE ARTICLE PAGINATION
+// Pagination of Articles in ArticleListView
+
+var page = 1;  // Initial page number
+var pagesNum = $('#article-pages-num').data('article_pages_num')
+var articleUrl = $('#article-url').data('article_url')
+
+$("#load-more-button").click(function() {
+    $.ajax({
+        url: articleUrl,
+        data: { page: page + 1 },  // Send the next page number
+        dataType: "html",  // Expecting HTML response
+        success: function(data) {
+            if (data) {
+                var articles = ($(data).find(".article-card-cover"))
+
+                $("#content-container").append(articles);
+                page++;  // Increment the page counter
+            } 
+            
+            if (page == pagesNum ){
+                $("#load-more-button").hide();  // No more items to load
+            }
+        }
+    });
+});

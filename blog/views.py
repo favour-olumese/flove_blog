@@ -94,6 +94,7 @@ class ArticleListView(ListView):
     # model = Article
     template_name = 'blog/article_list.html'
     queryset = Article.objects.filter(article_status='p')
+    paginate_by = 10
 
     def get_queryset(self, **kwargs):
         """Handles query set for both all articles and viewing saved articles.

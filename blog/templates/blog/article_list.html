@@ -16,76 +16,86 @@
 
 <div class="body-content">
 
-<!-- Display notification for user to create writer profile if they are yet to create it. -->
-{% if user != 'AnonymousUser' and user.writer == '' %}
-<div class="info">
-    <span>
-        Please, kindly create your 
-        <a href="{% url 'new-writer' %}" style="text-decoration: underline;">writer profile</a> 
-        to have full access to features.
-    </span>
-</div>
-{% endif %}
-
-<!-- Displays when page queryset is the list of writer's saved articles -->
-{% url 'saved-articles' as saved_articles %}
-{% if request.path == saved_articles %}
-    <h1>Saved Articles</h1>
-{% endif %}
-
-{% for article in article_list %}
-    <div class="article-card" style="border: 1px solid; padding: 10px 20px 33px 20px; border-radius: 20px;">
-        <div>
-            <a href="{{ article.writer.get_absolute_url }}">
-                
-                
-                <img src="{% if article.writer.profile_picture %}
-                {{ article.writer.profile_picture.url }}
-                {% else %}
-                {{ article.writer.user|gravatar }}
-                {% endif %}
-                "
-
-                alt="{{ article.writer }}"
-                style="width: 25px; border-radius: 30px; float: left;">
-                <small style="clear: right; padding: 4px 0 10px 4px;" >{{ article.writer }}</small>
-            </a>
-        </div>
-        <a href="{{ article.get_absolute_url }}">
-            {% if article.article_img %}
-                <img src="{{ article.article_img.url }}" alt="" class="article-card-image" style="width: 30%; float: right; border-radius: 30px;">
-            {% endif %}
-            <div class="article-card-text" style="width: 60%;" >
-                <h3>{{ article.title }}</h3>
-                <p>{{ article.text|truncatechars_html:150 }}</p>
-                <small>{{ article.get_article_status_display }}</small>
-            </div>
-        </a>
-
-        <!-- Save/Unsave Article -->
-        <form class="save-form">
-            {% csrf_token %}
-            <input class="article_id" type="hidden" name="article_id" value="{{ article.id }}">
-
-            <input id="save-button" type="submit" style="font-family: FontAwesome; float: left;"
-                    value="{% if article in request.user.writer.saved_articles.all %}&#xf02e;{% else %}&#xf097;{% endif %}"
-                    title="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
-
-            <div id="save-form-url" data-save_form_url="{% url 'save-article' article.writer.user article.article_url %}"></div>
-        </form>
-
-        {% if request.user.writer.id == article.writer.id %}
-        <a href="{% url 'update-article' article.writer.user article.article_url %}" title="Edit" style="margin-left: 4px;"><i class="fa-solid fa-pen-nib"></i></a>
-        <a href="{% url 'delete-article' article.writer.user article.article_url %}" title="Delete" style="margin-left: 4px;"><i class="fa-solid fa-trash"></i></a>
-        {% endif %}
+    <!-- Display notification for user to create writer profile if they are yet to create it. -->
+    {% if user != 'AnonymousUser' and user.writer == '' %}
+    <div class="info">
+        <span>
+            Please, kindly create your 
+            <a href="{% url 'new-writer' %}" style="text-decoration: underline;">writer profile</a> 
+            to have full access to features.
+        </span>
     </div>
-    <hr>
+    {% endif %}
 
-{% empty %}
-    <p>There are no articles</p>
+    <!-- Displays when page queryset is the list of writer's saved articles -->
+    {% url 'saved-articles' as saved_articles %}
+    {% if request.path == saved_articles %}
+        <h1>Saved Articles</h1>
+    {% endif %}
 
-{% endfor %}
+    <div id="content-container">
+    {% for article in article_list %}
+        <div class="article-card-cover">
+            <div class="article-card" style="border: 1px solid; padding: 10px 20px 33px 20px; border-radius: 20px;">
+                <div>
+                    <a href="{{ article.writer.get_absolute_url }}">
+                        
+                        
+                        <img src="{% if article.writer.profile_picture %}
+                        {{ article.writer.profile_picture.url }}
+                        {% else %}
+                        {{ article.writer.user|gravatar }}
+                        {% endif %}
+                        "
+
+                        alt="{{ article.writer }}"
+                        style="width: 25px; border-radius: 30px; float: left;">
+                        <small style="clear: right; padding: 4px 0 10px 4px;" >{{ article.writer }}</small>
+                    </a>
+                </div>
+                <a href="{{ article.get_absolute_url }}">
+                    {% if article.article_img %}
+                        <img src="{{ article.article_img.url }}" alt="" class="article-card-image" style="width: 30%; float: right; border-radius: 30px;">
+                    {% endif %}
+                    <div class="article-card-text" style="width: 60%;" >
+                        <h3>{{ article.title }}</h3>
+                        <p>{{ article.text|truncatechars_html:150 }}</p>
+                        <small>{{ article.get_article_status_display }}</small>
+                    </div>
+                </a>
+
+                <!-- Save/Unsave Article -->
+                <form class="save-form">
+                    {% csrf_token %}
+                    <input class="article_id" type="hidden" name="article_id" value="{{ article.id }}">
+
+                    <input id="save-button" type="submit" style="font-family: FontAwesome; float: left;"
+                            value="{% if article in request.user.writer.saved_articles.all %}&#xf02e;{% else %}&#xf097;{% endif %}"
+                            title="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
+
+                    <div id="save-form-url" data-save_form_url="{% url 'save-article' article.writer.user article.article_url %}"></div>
+                </form>
+
+                {% if request.user.writer.id == article.writer.id %}
+                <a href="{% url 'update-article' article.writer.user article.article_url %}" title="Edit" style="margin-left: 4px;"><i class="fa-solid fa-pen-nib"></i></a>
+                <a href="{% url 'delete-article' article.writer.user article.article_url %}" title="Delete" style="margin-left: 4px;"><i class="fa-solid fa-trash"></i></a>
+                {% endif %}
+            </div>
+            <hr>
+        </div>
+    {% empty %}
+        <p>There are no articles</p>
+
+    {% endfor %}
+    
+    </div>
+    <div style="display: flex; justify-content: center;">
+        <button id="load-more-button">Load More</button>
+    </div>
 </div>
 <div id="check-authenticaton", data-check_authentication="{{ user.is_authenticated|lower }}"></div>
 <div id="login-page-redirect" data-login_page_redirect="{% url 'login' %}?next={{ request.path }}"></div>
+<div id="article-url" data-article_url="{% url 'articles' %}"></div>
+<div id="article-pages-num" data-article_pages_num="{{ page_obj.paginator.num_pages }}"></div>
+
 {% endblock %}
