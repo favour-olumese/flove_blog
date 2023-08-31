@@ -87,16 +87,16 @@
             </span>
             <hr>
 
-            <div style="border: 1px solid saddlebrown; align-items: center;">
+            <div style="display: grid; place-items: center;">
                 {% if article.article_img %}
                     <br>
-                    <img src="{{ article.article_img.url }}" alt="" style="width: 90%;">
+                    <img src="{{ article.article_img.url }}" alt="" style="width: 95%;">
                 {% endif %}
                 
                 <!-- Article audio -->
                 {% if article.article_audio and article.display_audio == 'y' %}
                     <br>
-                    <audio controls controlsList="nodownload" style="width: 90%; height: 50px; display: block;">
+                    <audio controls controlsList="nodownload" style="width: 95%; height: 50px; display: block;">
                         <source src="{{ article.article_audio.url }}" type="audio/mpeg">
                     </audio>
                 {% endif %}
