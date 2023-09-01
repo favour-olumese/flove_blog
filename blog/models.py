@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse
+# For rich text
+from ckeditor.fields import RichTextField
 
 
 class Writer(models.Model):
@@ -48,7 +50,7 @@ class Article(models.Model):
 
     writer = models.ForeignKey(Writer, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
-    text = models.TextField()
+    text = RichTextField()
     article_img = models.ImageField(upload_to='img/article_img/', null=True, blank=True)
     pub_date = models.DateTimeField(auto_now_add=True) 
     update_date = models.DateTimeField(auto_now=True)

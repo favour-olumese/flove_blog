@@ -22,8 +22,14 @@ from uuid import uuid4
 
 # For handling of text to speech for article audio.
 import pyttsx3
-from tempfile import NamedTemporaryFile
 import os
+
+# Using rich text audio to contain hmtl tags.
+# This filters our the tags and unicode characters
+from django.utils.html import strip_tags    # Removes html tags
+from html import unescape   # Converts unicode to Python equivalent
+from unicodedata import normalize # Convert Python unicode character to text equivalent
+
 
 # For calculating how long it would take to read an article
 import time
@@ -48,7 +54,7 @@ def home(request):
 
 
 def register_user(request):
-    """View for user registration."""
+    """Registers new users."""
 
     form = UserRegistrationForm()
 
@@ -89,7 +95,7 @@ def register_user(request):
 
 
 class ArticleListView(ListView):
-    """List view of all public articles."""
+    """Lists all public articles."""
 
     # model = Article
     template_name = 'blog/article_list.html'
@@ -124,7 +130,7 @@ class ArticleListView(ListView):
 
 
 class ArticleDetailView(DetailView):
-    """Content of each article view."""
+    """Display content of articles"""
 
     model = Article
     slug_url_kwarg = 'article_url'
@@ -175,7 +181,7 @@ class ArticleDetailView(DetailView):
 
 
 class ArticleCreateView(LoginRequiredMixin, CreateView):
-    """View for creating new articles."""
+    """Creates new articles."""
 
     model = Article
     fields = ['article_img', 'title', 'text', 'article_status', 'display_audio']
@@ -197,7 +203,12 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
         form.instance.article_url = slugify(article_url_path)
 
         # Saving article audio
-        title_and_text = form.instance.title + '\n' + form.instance.text
+        text_with_tags_and_unicode = form.instance.text
+        text_with_only_unicode = strip_tags(text_with_tags_and_unicode)  # Remove tags
+        text_with_python_unicode = unescape(text_with_only_unicode)  # Convert unicode to python equivalent
+        cleaned_text = normalize("NFKC", text_with_python_unicode)  # Convert to normal text
+
+        title_and_text = form.instance.title + '\n' + cleaned_text
         audio_name = str(user_name) + '_' + form.instance.article_url + '.mp3'
 
         engine = pyttsx3.init()
@@ -229,7 +240,7 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
 
 
 class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    """View for updating articles."""
+    """Updates already created articles."""
 
     model = Article
     fields = ['article_img', 'title', 'text', 'article_status', 'display_audio']
@@ -268,7 +279,12 @@ class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         article_url = self.kwargs['article_url']
 
         # Title and text to be converted to speech.
-        title_and_text = form.instance.title + '\n' + form.instance.text
+        text_with_tags_and_unicode = form.instance.text
+        text_with_only_unicode = strip_tags(text_with_tags_and_unicode)  # Remove tags
+        text_with_python_unicode = unescape(text_with_only_unicode)  # Convert unicode to python equivalent
+        cleaned_text = normalize("NFKC", text_with_python_unicode)  # Convert to normal text
+
+        title_and_text = form.instance.title + '\n' + cleaned_text
         audio_name = username + '_' + article_url + '.mp3'
 
         # Text to speech
@@ -295,7 +311,7 @@ class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 
 class ArticleDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    """View for deleting articles."""
+    """Deletes existing articles."""
 
     model = Article
     slug_url_kwarg = 'article_url'
@@ -337,7 +353,7 @@ class ArticleDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 @login_required
 def article_filter(request):
-    """Function for writer to view all published, unlisted, or public articles."""
+    """Filters published, unlisted, or public articles for requesting writer."""
 
     article_status = request.GET.get('article_status')
     writer = request.user.writer
@@ -423,7 +439,7 @@ def article_likes(request, username, article_url):
 
 @login_required
 def save_article(request, username, article_url):
-    """Function for saving of articles by writers.
+    """Function for saving/bookmarking of articles by writers.
     
     - Articles saved by a writer are added to the saved_articles 
     field of the Writer.
@@ -483,7 +499,7 @@ def save_article(request, username, article_url):
 
 
 class WriterCreateView(LoginRequiredMixin, CreateView):
-    """View for creating writer profile."""
+    """Creates writer profile."""
 
     model = Writer
     fields = ['profile_picture', 'first_name', 'last_name', 'bio', 'website_url', 'linkedin_url', 'display_email']
@@ -510,7 +526,7 @@ class WriterCreateView(LoginRequiredMixin, CreateView):
 
 
 class WriterUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    """View for updating user details."""
+    """Updates writer's profile."""
     
     model = Writer
     fields = ['profile_picture', 'first_name', 'last_name', 'bio', 'website_url', 'linkedin_url', 'display_email']
@@ -561,7 +577,7 @@ class WriterUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 
 class WriterDetailView(DetailView):
-    """View of writer page."""
+    """Displays writer's details and articles written."""
 
     model = Writer
     slug_url_kwarg = 'username'
@@ -637,7 +653,7 @@ def comment(request, username, article_url):
 
 
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    """Deleting user's comment."""
+    """Deletes user's comment."""
 
     model = Comment
 
@@ -724,7 +740,7 @@ def reply(request, username, article_url):
 
 
 class ReplyDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    """Delete a user's reply."""
+    """Deletes a user's reply."""
 
     model = Reply
 
