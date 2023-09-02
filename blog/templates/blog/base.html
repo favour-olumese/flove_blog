@@ -37,6 +37,12 @@
                 </span>
                 </a>
 
+                <form action="{% url 'search' %}" method="get" style="display: inline; margin-left: 20px;">
+                    <input type="search" name="search" minlength="3" placeholder="Search" style="border-radius: 15px; padding: 5px; border: 1px solid navy;" required>
+                    <input type="submit" value="&#xf002;" style="font-family: FontAwesome; border-radius: 15px; padding: 5px; border: 1px solid navy; background-color
+                    : #000080; color: aliceblue; cursor: pointer;">
+                </form>
+
                 <div style="width: 30%;; float: right; margin: auto; padding: 5px;">
                     <span class="nav-image nav-element">
                         {% if user.is_authenticated %}

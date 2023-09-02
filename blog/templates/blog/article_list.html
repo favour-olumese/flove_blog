@@ -33,6 +33,33 @@
         <h1>Saved Articles</h1>
     {% endif %}
 
+    {% url 'search' as search_content %}
+    {% if request.path == search_content %}
+        <h3>{{ query_count }} result{{ query_count|pluralize }} for {{ search_data }}</h3>
+        {% if writer_list %}
+            {% for writer in writer_list %}
+                <div style="width: 10%; display: inline-block; border: 1px solid navy; text-align: center; padding: 10px; border-radius: 20px; margin-bottom: 10px;">
+                    <a href="{{ writer.get_absolute_url }}">
+                        
+                        
+                        <img src="{% if writer.profile_picture %}
+                        {{ writer.profile_picture.url }}
+                        {% else %}
+                        {{ writer.user|gravatar }}
+                        {% endif %}
+                        "
+
+                        alt="{{ article.writer }}"
+                        style="width: 25px; border-radius: 30px;"><br>
+                        <small>{{ writer.first_name }}</small>
+                    </a>
+                </div>
+            {% endfor %}
+
+            
+        {% endif %}
+    {% endif %}
+
     <div id="content-container">
     {% for article in article_list %}
         <div class="article-card-cover">
@@ -59,7 +86,7 @@
                     {% endif %}
                     <div class="article-card-text" style="width: 60%;" >
                         <h3>{{ article.title }}</h3>
-                        <p>{{ article.text|truncatechars_html:150 }}</p>
+                        <p>{{ article.text|safe|truncatechars_html:100 }}</p>
                         <small>{{ article.get_article_status_display }}</small>
                     </div>
                 </a>
@@ -89,9 +116,11 @@
     {% endfor %}
     
     </div>
-    <div style="display: flex; justify-content: center;">
-        <button id="load-more-button">Load More</button>
-    </div>
+    {% if page_obj.has_next %}
+        <div style="display: flex; justify-content: center;">
+            <button id="load-more-button">Load More</button>
+        </div>
+    {% endif %}
 </div>
 <div id="check-authenticaton", data-check_authentication="{{ user.is_authenticated|lower }}"></div>
 <div id="login-page-redirect" data-login_page_redirect="{% url 'login' %}?next={{ request.path }}"></div>

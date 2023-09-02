@@ -40,6 +40,9 @@ from blog.forms import CommentForm, ReplyForm
 # For displaying error message for comments and replies
 from django.contrib import messages
 
+# For making search form
+from django.db.models import Q
+
 
 def home(request):
     """Blog home page."""
@@ -771,3 +774,20 @@ class ReplyDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return reverse_lazy('article-detail',
                             kwargs={'article_url':self.kwargs['article_url'],
                                     'username':self.kwargs['username']})
+
+
+def search(request):
+    search_data = request.GET.get('search')
+
+    writer_list = Writer.objects.filter(Q(first_name__icontains=search_data) | Q(last_name__icontains=search_data))
+    article_list = Article.objects.filter(Q(title__icontains=search_data) | Q(text__icontains=search_data))
+    query_count = len(writer_list) + len(article_list)
+
+    context = {
+        'search_data': search_data,
+        'writer_list' : writer_list,
+        'article_list' : article_list,
+        'query_count' : query_count,
+    }
+
+    return render(request, 'blog/article_list.html', context)
