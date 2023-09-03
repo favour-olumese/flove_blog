@@ -780,7 +780,12 @@ def search(request):
     search_data = request.GET.get('search')
 
     writer_list = Writer.objects.filter(Q(first_name__icontains=search_data) | Q(last_name__icontains=search_data))
-    article_list = Article.objects.filter(Q(title__icontains=search_data) | Q(text__icontains=search_data))
+    article_list = Article.objects.filter(
+                                    Q(title__icontains=search_data) | 
+                                    Q(text__icontains=search_data) | 
+                                    Q(writer__first_name__icontains=search_data) | 
+                                    Q(writer__last_name__icontains=search_data))
+
     query_count = len(writer_list) + len(article_list)
 
     context = {
