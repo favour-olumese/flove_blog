@@ -106,7 +106,7 @@
                     {% endif %}
                     <div class="article-card-text" style="width: 60%;" >
                         <h3>{{ article.title }}</h3>
-                        <p>{{ article.text|truncatechars_html:150 }}</p>
+                        <p>{{ article.text|safe|truncatechars_html:100 }}</p>
                         <small>{{ article.get_article_status_display }}</small>
                     </div>
                 </a>
