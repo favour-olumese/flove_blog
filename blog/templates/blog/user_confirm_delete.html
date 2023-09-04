@@ -1,0 +1,24 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}
+    <title>Delete {{ user }} | Flove</title>
+{% endblock %}
+
+{% block content %}
+
+    <div class="body-content">
+        <form method="post">
+            {% csrf_token %}
+            <h2 style="color: red;">Delete Account?</h2>
+            <p>Are you sure you want to delete your account?</p>
+            {{ form }}
+
+            <input type="submit" value="Yes">
+            <input type="submit" class="delete-cancel-button" value="Cancel">
+        </form>
+    </div>
+
+    <!-- Data value that would be sent to external JavaScript to cancel delete -->
+    <div id="cancel-delete-redirect-to-article", data-cancel_delete_redirect_to_article="{% url 'writer' user %}"></div>
+{% endblock %}
+

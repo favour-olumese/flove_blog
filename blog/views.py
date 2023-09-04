@@ -97,6 +97,39 @@ def register_user(request):
     return render(request, 'registration/register.html', {'form':form})
 
 
+class UserDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """Deletes user account."""
+    model = User
+    slug_url_kwarg = 'username'
+    template_name = 'blog/user_confirm_delete.html'
+    success_url = reverse_lazy('home')
+
+    def  get_object(self, queryset=None):
+        """Assigns username of the User model to the url kwarg."""
+
+        user = self.kwargs.get(self.slug_url_kwarg)
+
+        return get_object_or_404(self.model, username=user)
+    
+    def test_func(self):
+        """"Works with UserPassesTestMixin.
+
+        Returns True when current user owner of account
+        but returns False when current user is not.
+        """
+
+        username = User.objects.filter(username=self.kwargs['username'])[0]
+        return username == self.request.user
+
+    def handle_no_permission(self, *kwargs):
+        """Redirect current user who is not user of the account to the home page.
+
+        By default, test_func redirects user who do not own the account to the 403 page.
+        """
+        
+        return redirect(reverse_lazy('home'))
+
+
 class ArticleListView(ListView):
     """Lists all public articles."""
 
@@ -253,8 +286,8 @@ class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         """"Works with UserPassesTestMixin.
 
-        Returns True when current user is the article onwer;
-        but returns False when current user is not the article onwer.
+        Returns True when current user is the article owner;
+        but returns False when current user is not the article owner.
         """
 
         article = Article.objects.filter(article_url=self.kwargs['article_url'])[0]
@@ -335,8 +368,8 @@ class ArticleDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         """"Works with UserPassesTestMixin.
 
-        Returns True when current user is the article onwer;
-        but returns False when current user is not the article onwer.
+        Returns True when current user is the article owner;
+        but returns False when current user is not the article owner.
         """
 
         article = Article.objects.filter(article_url=self.kwargs['article_url'])[0]
@@ -663,8 +696,8 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         """"Works with UserPassesTestMixin.
 
-        Returns True when current user is the article onwer;
-        but returns False when current user is not the article onwer.
+        Returns True when current user is the comment owner;
+        but returns False when current user is not the comment owner.
         """
 
         article = Article.objects.filter(article_url=self.kwargs['article_url'])[0]
@@ -674,7 +707,7 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def handle_no_permission(self, *kwargs):
         """Redirect current user who is not article owner to the article page.
 
-        By default, test_func redirects user who do not own the article to the 403 page.
+        By default, test_func redirects user who do not own the comment to the 403 page.
         """
         
         return redirect(reverse_lazy(
@@ -750,8 +783,8 @@ class ReplyDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         """"Works with UserPassesTestMixin.
 
-        Returns True when current user is the article onwer;
-        but returns False when current user is not the article onwer.
+        Returns True when current user is the reply owner;
+        but returns False when current user is not the reply owner.
         """
 
         article = Article.objects.filter(article_url=self.kwargs['article_url'])[0]
@@ -759,9 +792,9 @@ class ReplyDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return reply.replier.user == self.request.user
 
     def handle_no_permission(self, *kwargs):
-        """Redirect current user who is not article owner to the article page.
+        """Redirect current user who is not reply owner to the article page.
 
-        By default, test_func redirects user who do not own the article to the 403 page.
+        By default, test_func redirects user who do not own the reply to the 403 page.
         """
         
         return redirect(reverse_lazy(
@@ -776,7 +809,6 @@ class ReplyDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
                                     'username':self.kwargs['username']})
 
 
-from django.core.paginator import Paginator
 def search(request):
     search_data = request.GET.get('search')
 
@@ -802,5 +834,5 @@ def search(request):
         'article_list' : article_list,
         'query_count' : query_count,
     }
-        
+
     return render(request, 'blog/article_list.html', context)
