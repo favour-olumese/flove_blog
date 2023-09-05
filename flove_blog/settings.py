@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'django_cleanup.apps.CleanupConfig',
     # For rich text editor
     'ckeditor',
+    # For sharing of articles to social media
+    'django_social_share'
 ]
 
 MIDDLEWARE = [

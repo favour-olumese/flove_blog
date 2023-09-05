@@ -1,6 +1,7 @@
 {% extends 'blog/base.html' %}
 {% load static %}
 {% load app_tags %}
+{% load social_share %}
 
 {% block title %}
     <title>{{ article.title }} | Flove</title>
@@ -25,7 +26,7 @@
 
         {% else %}
             <h1>{{ article.title }}</h1>
-
+            
             <div>
                 <a href="{{ article.writer.get_absolute_url }}">
                     
@@ -66,8 +67,9 @@
             <hr>
             <!-- Article Time -->
             <small>{{ article_time }} read</small>
+            
 
-            <span style="float: right; padding-left: 4px;">
+            <span class="article-detail-icon-right" style="float: right; padding-left: 4px;">
 
                 {% if request.user.writer.id == article.writer.id %}
                     <a href="{% url 'update-article' article.writer.user article.article_url %}" title="Edit"><i class="fa-solid fa-pen-nib"></i></a>
@@ -85,6 +87,8 @@
                     title="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
                 </form>
             </span>
+
+            <span class="article-detail-icon-right" style="float: right; padding-right: 4px;">{% copy_to_clipboard article '<i class="fa-regular fa-clipboard"></i>' %}</span>
             <hr>
 
             <div style="display: grid; place-items: center;">
@@ -121,6 +125,14 @@
 
             <span id="likes-num">{{ num_of_likes }} Like{{ num_of_likes|pluralize }}</span>
             {% endwith %}
+
+            <!-- Social media share button -->
+            <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% copy_to_clipboard article '<i class="fa-regular fa-clipboard"></i>' %}</span>
+            <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% post_to_linkedin article %}</span>
+            <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% post_to_facebook article '<i class="fa-brands fa-facebook"></i>' %}</span>
+            <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% post_to_twitter "{{ article.title}}" article '<i class="fa-brands fa-square-x-twitter"></i>' %}</span>
+            <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% post_to_telegram "{{ article.title }}" article '<i class="fa-brands fa-telegram"></i>' %}</span>
+            <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% post_to_whatsapp article '<i class="fa-brands fa-square-whatsapp"></i>' %}</span>
             <div>
                 <h4>Comments</h4>
                 <!-- For error message in filling of form. -->
@@ -257,4 +269,7 @@
         <div id="like-form-url" data-like_form_url="{% url 'like-article' article.writer.user article.article_url %}"></div>
         <div id="save-form-url" data-save_form_url="{% url 'save-article' article.writer.user article.article_url %}"></div>
     </div>
+
+    <!-- For copying of articles link. -->
+    {% add_copy_script %}
 {% endblock %}
