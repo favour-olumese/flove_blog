@@ -23,5 +23,6 @@ urlpatterns = [
     path('@<str:username>/<slug:article_url>/save/', views.save_article, name='save-article'),
     path('me/articles/filter/', views.article_filter, name='filter'),
     path('me/articles/saved/', login_required(views.ArticleListView.as_view()), name='saved-articles'),
+    path('me/settings/', views.writer_settings_page, name='settings'),
     path('writer/create/', views.WriterCreateView.as_view(), name='new-writer'),
 ]

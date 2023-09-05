@@ -836,3 +836,13 @@ def search(request):
     }
 
     return render(request, 'blog/article_list.html', context)
+
+
+@login_required
+def writer_settings_page(request):
+    user = request.user
+
+    context = {
+        'user': user,
+    }
+    return render(request, 'blog/writer_settings.html', context)

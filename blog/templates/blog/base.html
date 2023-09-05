@@ -78,10 +78,6 @@
                 border-radius: 10px;">
                 {% if user.is_authenticated %}
                     <ul style="margin: 15px 10px; ">
-                        <a href="{% url 'writer-profile-update' user %}">
-                            <li>Profile</li>
-                        </a>
-                        <hr>
                         <!-- Display notification for user to create writer profile if they are yet to create it. -->
                         {% if user != 'AnonymousUser' and user.writer == '' %}
                             <a href="{% url 'new-writer' %}">
@@ -98,6 +94,11 @@
                                 <li>Saved stories</li>
                             </a>
                         {% endif %}
+
+                        <hr>
+                        <a href="{% url 'settings'%}">
+                            <li>Settings</li>
+                        </a>
 
                         <hr>
                         <a href="{% url 'logout' %}">
