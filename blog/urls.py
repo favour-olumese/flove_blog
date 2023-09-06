@@ -1,6 +1,7 @@
-from django.urls import path, include
+from django.urls import path
 from . import views
 from django.contrib.auth.decorators import login_required
+from blog.feeds import WriterFeed
 
 # app_name=
 urlpatterns = [
@@ -10,6 +11,7 @@ urlpatterns = [
     path('articles/search/', views.search, name='search'),
     path('article/create/', views.ArticleCreateView.as_view(), name='new-article'),
     path('@<str:username>/', views.WriterDetailView.as_view(), name='writer'),
+    path('@<str:username>/rss/', WriterFeed()),
     path('@<str:username>/delete', views.UserDeleteView.as_view(), name='delete-account'),
     path('@<str:username>/profile/update/', views.WriterUpdateView.as_view(), name='writer-profile-update'),
     path('@<str:username>/<slug:article_url>/', views.ArticleDetailView.as_view(), name='article-detail'),
