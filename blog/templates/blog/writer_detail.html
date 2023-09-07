@@ -62,6 +62,13 @@
             {% endif %}
 
         {% endif%}
+
+        <!-- RSS Feed Link -->
+        <span>
+            <a href="{% url 'rss-feed' writer.user %}">
+                <i class="fa-solid fa-rss"></i>
+            </a>
+        </span>
     </div>
 {% endblock %}
 
