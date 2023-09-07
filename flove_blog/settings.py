@@ -185,3 +185,9 @@ EMAIL_HOST_PASSWORD = env('EMAIL_PASSWORD')
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = env('EMAIL')
 SERVER_EMAIL = env('EMAIL')
+
+# For User Log in
+AUTHENTICATION_BACKENDS = (
+    'blog.auth.CustomModelBackend',
+    # "django.contrib.auth.backends.ModelBackend", # Default for logging with username
+)
