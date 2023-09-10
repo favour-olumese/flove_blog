@@ -14,11 +14,15 @@
         <p>Return to <a href="{% url 'home' %}">Homepage</a></p>
 
     {% else %}
-    <!-- 
-        {% if form.errors %}
-            <p>Your username and password didn't match. Please try again.</p>
-        {% endif %} 
-    -->
+
+        <!-- Message if user trying to login is not active. -->
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
 
         {% if next %}
             {% if user.is_authenticated %}

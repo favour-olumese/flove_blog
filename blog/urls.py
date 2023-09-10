@@ -6,6 +6,7 @@ from blog.feeds import WriterFeed
 # app_name=
 urlpatterns = [
     path('', views.home, name='home'),
+    path('accounts/login/', views.CustomLoginView.as_view(), name='login'),
     path('register/', views.register_user, name='register'),
     path('articles/', views.ArticleListView.as_view(), name='articles'),
     path('articles/search/', views.search, name='search'),

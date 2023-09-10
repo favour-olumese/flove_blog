@@ -42,9 +42,6 @@ class CustomModelBackend(ModelBackend):
 
         Returns:
             User: The user object if found, or None if no user with the given ID exists.
-
-        Raises:
-            None
         """
         try:
             return User.objects.get(pk=user_id)

@@ -4,6 +4,8 @@ from django.urls import reverse, reverse_lazy
 from django.contrib.auth.models import User
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.contrib.auth.views import LoginView
+from django.core.exceptions import ObjectDoesNotExist
 
 # Models
 from blog.models import Article, Writer, Comment, Reply
@@ -56,6 +58,43 @@ def home(request):
     return render(request, 'blog/index.html', context)
 
 
+class CustomLoginView(LoginView):
+    """
+    Login view for users to log in. Inherits that LoginView functionality.
+    """
+
+    def form_invalid(self, form):
+        """
+        Checks if user is active.
+
+        If user is not active is not active. The form is returned and
+        the user is sent a mail with token to activate their account.
+
+
+        Args:
+            form: The login form.
+
+        Returns:
+            super().form_invalid(form): Super class functionality.
+        """
+
+        # Check if the user is not active
+        try:
+            username = self.request.POST['username']
+            user = User.objects.filter(Q(username=username) | Q(email=username))[0]
+            print(user)
+            if not user.is_active:
+                # Add a custom error message
+                messages.error(self.request, 'This account is inactive. Please check your email to activate your account.')
+                send_email(user)
+        except IndexError:
+            pass
+
+        # Call the parent class's form_invalid method
+        # and passing the form submitted.
+        return super().form_invalid(form)
+
+
 def register_user(request):
     """Registers new users."""
 
@@ -70,6 +109,20 @@ def register_user(request):
             user_username = form.cleaned_data['username']
             user_password = form.cleaned_data['password1']
 
+            # Check if email already exist in the database.
+            try:
+                email_exist = User.objects.get(email=user_email)
+
+                if email_exist:
+                    context = {
+                        'form': form,
+                        'email_error':'A user with this email already exists.',
+                    }
+                    return render(request, 'registration/register.html', context)
+            except ObjectDoesNotExist:
+                pass
+
+
             user = User.objects.create_user(
                 username=user_username, 
                 email=user_email, 
@@ -81,17 +134,6 @@ def register_user(request):
 
             send_email(user)
 
-            # # Check if email already exist in the database.
-            # email_exist = User.objects.get(email=user_email)
-
-            # if email_exist:
-            #     context = {
-            #         'form':form,
-            #         'email_error':'Email already exist.'
-            #     }
-            #     return render(request, 'registration/register.html', context)
-            
-
             return HttpResponseRedirect(reverse('login'))
 
     return render(request, 'registration/register.html', {'form':form})
@@ -99,6 +141,7 @@ def register_user(request):
 
 class UserDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """Deletes user account."""
+
     model = User
     slug_url_kwarg = 'username'
     template_name = 'blog/user_confirm_delete.html'
@@ -227,6 +270,9 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
         - Assigns article to current user
         - Use article's title and uuid to create url path of article.
         - Create article audio using pyttsx3 module
+
+        Args:
+            form: The article creation form submitted.
         """
 
         # Assigns the writer field to the current user.
@@ -547,7 +593,8 @@ class WriterCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get(self, request, *args, **kwargs):
-        """Redirects users who have created their writer profile already 
+        """
+        Redirects users who have created their writer profile already 
         to the writer's update page.
         
         If user has not created a profile, they are taken to the profile
@@ -578,7 +625,8 @@ class WriterUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return get_object_or_404(self.model, user=user_id)
 
     def test_func(self):
-        """"Works with UserPassesTestMixin.
+        """
+        Works with UserPassesTestMixin.
 
         - Returns True when current user is the profile owner;
         but returns False when current user is not.
@@ -596,7 +644,8 @@ class WriterUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             return False
 
     def handle_no_permission(self, *kwargs):
-        """Redirect current user who is not profile owner to the user page.
+        """
+        Redirect current user who is not profile owner to the user page.
 
         - By default, test_func redirects user who do not own 
         the profile to the 403 page.
@@ -644,14 +693,15 @@ class WriterDetailView(DetailView):
 
 @login_required()
 def comment(request, username, article_url):
-    """Function for commenting on articles.
+    """
+    Function for commenting on articles.
     
     - Users yet to create their writer profile are redirected 
     to the writer creation template.
     - Users not logged in are redirected to the login page.
 
-    username        the user requesting to save the article
-    article_url     the url of the article being saved
+    username: The user requesting to save the article
+    article_url: The url of the article being saved
     """
 
     if request.method == 'POST':
@@ -810,13 +860,14 @@ class ReplyDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 def search(request):
+    """Searches through all the article"""
     search_data = request.GET.get('search')
 
     writer_list = Writer.objects.filter(Q(first_name__icontains=search_data) |
                                         Q(last_name__icontains=search_data) |
                                         Q(user__email=search_data) |
                                         Q(user__username=search_data)
-                                        )
+                                        ).exclude(display_email=False)
 
     article_list = Article.objects.filter(Q(title__icontains=search_data) |
                                           Q(text__icontains=search_data) |
@@ -824,7 +875,9 @@ def search(request):
                                           Q(writer__last_name__icontains=search_data) |
                                           Q(writer__user__email=search_data) |
                                           Q(writer__user__username=search_data)
-                                          )
+                                          ).exclude(Q(article_status='d') |
+                                                    Q(article_status='u') |
+                                                    Q(writer__display_email=False))
 
     query_count = len(writer_list) + len(article_list)
 
@@ -840,6 +893,7 @@ def search(request):
 
 @login_required
 def writer_settings_page(request):
+    """Setting page for user to update their profile and delete their account."""
     user = request.user
 
     context = {
