@@ -900,3 +900,8 @@ def writer_settings_page(request):
         'user': user,
     }
     return render(request, 'blog/writer_settings.html', context)
+
+
+def page_not_found(request, exception):
+    """Serves the 404 template"""
+    render(request, '404.html')
