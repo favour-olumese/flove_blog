@@ -1,4 +1,5 @@
 {% extends 'blog/base.html' %}
+{% load static %}
 
 {% block title %}
     <title>Not Found | Flove</title>
@@ -7,7 +8,7 @@
 {% block content %}
     <div class="body-content">
         <div class="register-form">
-            
+            <img src="{% static 'img/flove_404_icon.gif' %}" alt="404 GIF" style="width: 100%;">
             <p>Kindly, go back to the <a href="{% url 'home' %}">home page</a></p>
         </div>
     </div>

@@ -904,4 +904,4 @@ def writer_settings_page(request):
 
 def page_not_found(request, exception):
     """Serves the 404 template"""
-    render(request, '404.html')
+    return render(request, '404.html')

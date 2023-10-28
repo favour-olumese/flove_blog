@@ -10,10 +10,17 @@ django-js-asset==2.1.0
 django-social-share==2.3.0
 packaging==23.0
 Pillow==9.4.0
-# psycopg2==2.9.6
 PyJWT==2.6.0
-# pypiwin32==223
 pyttsx3==2.90
-# pywin32==305
 sqlparse==0.4.3
 tzdata==2022.7
+
+# Might have to comment out on Ubuntu
+pypiwin32==223
+pywin32==305
+psycopg2==2.9.6
+
+# Required for Ubuntu
+pkg_resources==0.0.0
+psycopg2-binary==2.9.9
+backports.zoneinfo==0.2.1
