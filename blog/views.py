@@ -127,8 +127,8 @@ def register_user(request):
 
 
             user = User.objects.create_user(
-                username=user_username, 
-                email=user_email, 
+                username=user_username,
+                email=user_email,
                 password=user_password,
                 )
 
@@ -251,13 +251,21 @@ class ArticleDetailView(DetailView):
 
         context['article_time'] = article_time
 
-        # More articles by same writer for readers to read
+        # More 3 recent articles by same writer for readers to read.
         writer_username = self.kwargs['username']
         user_id = User.objects.filter(username=writer_username).values()[0]['id']
         writer  = Writer.objects.get(user=user_id)
 
         more_article = Article.objects.filter(writer=writer).exclude(article_url=article_url).exclude(article_status='d')[:3]
         context['more_article'] = more_article
+
+        # Addition of number of comments and replies
+        comment_count =  Article.objects.filter(id=31).get().comment_set.all().count()
+        reply_count =  Article.objects.filter(id=31).get().reply_set.all().count()
+
+        total_comment = comment_count + reply_count
+
+        context['total_comment'] = total_comment
 
         return context
 

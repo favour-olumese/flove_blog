@@ -88,7 +88,7 @@
                 </form>
             </span>
 
-            <span class="article-detail-icon-right" style="float: right; padding-right: 4px;">{% copy_to_clipboard article '<i class="fa-regular fa-clipboard" id="clipboard" ></i>' %}</span>
+            <span class="article-detail-icon-right" style="float: right; padding-right: 4px; cursor: pointer;">{% copy_to_clipboard article '<i class="fa-regular fa-clipboard" id="clipboard" ></i>' %}</span>
             <hr>
 
             <div style="display: grid; place-items: center;">
@@ -155,7 +155,9 @@
 
                 <!-- Comments -->
                 {% if article.comment_set.all %}
-                <a href="" onclick="show_comments(); return false" id="show-comments">Open comments</a>
+                <small>{{ total_comment }} comment{{ total_comment|pluralize }}</small>
+                <br>
+                <a href="" onclick="show_comments(); return false" id="show-comments"><span style="font-family: FontAwesome">&#xf107;</span> Open comments</a>
                 <div id="comment-area">
                     <div id="comment-area-body">
                         {% for comment in article.comment_set.all %}
@@ -232,7 +234,7 @@
                         {% endfor %}
                     </div>
                 </div>
-                <a href="" onclick="hide_comments(); return false" id="hide-comments">Close comments</a>
+                <a href="" onclick="hide_comments(); return false" id="hide-comments"><span style="font-family: FontAwesome">&#xf106;</span> Close comments</a>
                 {% endif %}
             </div>
 
