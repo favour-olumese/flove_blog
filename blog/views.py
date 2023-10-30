@@ -45,10 +45,13 @@ from django.contrib import messages
 # For making search form
 from django.db.models import Q
 
+# For sending email notifications when an article is commented.
+import django.core.mail
+from flove_blog.settings import EMAIL_FROM_ADDRESS as flove_blog_email
+
 
 def home(request):
     """Blog home page."""
-
     hello = 'Welcome to Flove blog. Nice to have you here.'
 
     context = {
@@ -723,7 +726,17 @@ def comment(request, username, article_url):
                     commenter=commenter,
                     article=article,
                 )
-
+                
+                # Notifications are sent to the author when other people comment on the article.
+                if request.user != article.writer.user:
+                    article_link = article.get_absolute_url()
+                    domain = request.META['HTTP_HOST']
+                    subject = f'New Comment on your article, {article}.'
+                    message = f'You have a comment on your article, {article}, from {commenter}.\n\n"{comment_text}"\n\n{domain}{article_link}' 
+                    from_email = flove_blog_email
+                    recipient = [article.writer.user.email]
+                    django.core.mail.EmailMessage(subject, message, from_email, recipient).send()
+            
             # Using the message field to display errors
             else:
                 messages.error(request, 'Text field required.')
@@ -810,6 +823,29 @@ def reply(request, username, article_url):
                     article=article,
                     comment=comment_query,
                 )
+                
+
+                # Notifications are sent to the author when other people comment on the article.
+                article_link = article.get_absolute_url()
+                domain = request.META['HTTP_HOST']
+                from_email = flove_blog_email
+
+                if request.user != comment_query.commenter.user:
+                    subject = f'New Reply to Your Comment in {article}.'
+
+                    message = f'You have a response on your comment, "{comment_query.text}", from {replier} in {article}.\n\n"{reply_text}"\n\n{domain}{article_link}'
+
+                    recipient = [comment_query.commenter.user.email]
+                    django.core.mail.EmailMessage(subject, message, from_email, recipient).send()
+
+                elif request.user != comment_query.article.writer.user:
+                    subject = f'New Comment in Your article, {article}.'
+
+                    message = f'You have a response to a comment, "{comment_query.text}", from {replier} in {article}.\n\n"{reply_text}"\n\n{domain}{article_link}'
+
+                    recipient = [article.writer.user.email]
+                    
+                    django.core.mail.EmailMessage(subject, message, from_email, recipient).send()
 
             # Using the message field to display errors
             else:
