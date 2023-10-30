@@ -88,7 +88,7 @@
                 </form>
             </span>
 
-            <span class="article-detail-icon-right" style="float: right; padding-right: 4px;">{% copy_to_clipboard article '<i class="fa-regular fa-clipboard"></i>' %}</span>
+            <span class="article-detail-icon-right" style="float: right; padding-right: 4px;">{% copy_to_clipboard article '<i class="fa-regular fa-clipboard" id="clipboard" ></i>' %}</span>
             <hr>
 
             <div style="display: grid; place-items: center;">
@@ -127,7 +127,6 @@
             {% endwith %}
 
             <!-- Social media share button -->
-            <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% copy_to_clipboard article '<i class="fa-regular fa-clipboard"></i>' %}</span>
             <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% post_to_linkedin article %}</span>
             <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% post_to_facebook article '<i class="fa-brands fa-facebook"></i>' %}</span>
             <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% post_to_twitter "{{ article.title}}" article '<i class="fa-brands fa-square-x-twitter"></i>' %}</span>

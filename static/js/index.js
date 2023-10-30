@@ -190,3 +190,20 @@ $("#load-more-button").click(function() {
         }
     });
 });
+
+// Change clipboard icon when clicked and change it back after 3 seconds.
+
+let copyArticleLink = document.getElementById("clipboard")
+
+copyArticleLink.addEventListener("click", function(){
+    copyArticleLink.classList.remove("fa-clipboard")
+    copyArticleLink.classList.remove("fa-regular")
+    copyArticleLink.classList.add("fa")
+    copyArticleLink.classList.add("fa-check")
+    setTimeout(()=> {
+        copyArticleLink.classList.remove("fa")
+        copyArticleLink.classList.remove("fa-check")
+        copyArticleLink.classList.add("fa-regular")
+        copyArticleLink.classList.add("fa-clipboard")
+    }, 3000);
+});

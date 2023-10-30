@@ -39,7 +39,7 @@
         <h3>{{ query_count }} result{{ query_count|pluralize }} for {{ search_data }}</h3>
         {% if writer_list %}
             <details>
-                <summary>Writers</summary>
+                <summary style="cursor: pointer;">Writers</summary>
                 {% for writer in writer_list %}
                     <div style="width: 10%; display: inline-block; border: 1px solid navy; text-align: center; padding: 10px; border-radius: 20px;">
                         <a href="{{ writer.get_absolute_url }}">

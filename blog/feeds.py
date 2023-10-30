@@ -1,3 +1,5 @@
+"""For Writers RSS Feed."""
+
 from django.contrib.syndication.views import Feed
 from blog.models import Writer, Article
 
