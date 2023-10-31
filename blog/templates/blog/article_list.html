@@ -65,6 +65,12 @@
 
     <div id="content-container">
     {% for article in article_list %}
+        <!-- The if statement ensures previously saved articles are hidden when their status changes to draft. -->
+        <!-- When the changes the status from public, it would be viewable again on the saved list of 
+            those who had previously saved it. -->
+
+        {% if article.article_status != 'd' %}
+
         <div class="article-card-cover">
             <div class="article-card" style="border: 1px solid; padding: 10px 20px 33px 20px; border-radius: 20px;">
                 <div>
@@ -94,18 +100,6 @@
                     </div>
                 </a>
 
-                <!-- Save/Unsave Article -->
-                <form class="save-form">
-                    {% csrf_token %}
-                    <input class="article_id" type="hidden" name="article_id" value="{{ article.id }}">
-
-                    <input id="save-button" type="submit" style="font-family: FontAwesome; float: left;"
-                            value="{% if article in request.user.writer.saved_articles.all %}&#xf02e;{% else %}&#xf097;{% endif %}"
-                            title="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
-
-                    <div id="save-form-url" data-save_form_url="{% url 'save-article' article.writer.user article.article_url %}"></div>
-                </form>
-
                 {% if request.user.writer.id == article.writer.id %}
                 <a href="{% url 'update-article' article.writer.user article.article_url %}" title="Edit" style="margin-left: 4px;"><i class="fa-solid fa-pen-nib"></i></a>
                 <a href="{% url 'delete-article' article.writer.user article.article_url %}" title="Delete" style="margin-left: 4px;"><i class="fa-solid fa-trash"></i></a>
@@ -113,6 +107,7 @@
             </div>
             <hr>
         </div>
+        {% endif %}
     {% empty %}
         <p>There are no articles</p>
 

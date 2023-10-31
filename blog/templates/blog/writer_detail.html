@@ -118,18 +118,6 @@
                     </div>
                 </a>
 
-                <!-- Save/Unsave Article -->
-                <form class="save-form">
-                    {% csrf_token %}
-                    <input class="article_id" type="hidden" name="article_id" value="{{ article.id }}">
-
-                    <input id="save-button" type="submit" style="font-family: FontAwesome; float: left;"
-                    value="{% if article in request.user.writer.saved_articles.all %}&#xf02e;{% else %}&#xf097;{% endif %}"
-                    title="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
-
-                    <div id="save-form-url" data-save_form_url="{% url 'save-article' article.writer.user article.article_url %}"></div>
-                </form>
-
                 {% if request.user == article.writer.user %}
                     <a href="{% url 'update-article' article.writer.user article.article_url %}" title="Edit" style="margin-left: 4px;"><i class="fa-solid fa-pen-nib"></i></a>
                     <a href="{% url 'delete-article' article.writer.user article.article_url %}" title="Delete" style="margin-left: 4px;"><i class="fa-solid fa-trash"></i></a>
