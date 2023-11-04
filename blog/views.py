@@ -52,13 +52,7 @@ from flove_blog.settings import EMAIL_FROM_ADDRESS as flove_blog_email
 
 def home(request):
     """Blog home page."""
-    hello = 'Welcome to Flove blog. Nice to have you here.'
-
-    context = {
-        'hello': hello
-    }
-
-    return render(request, 'blog/index.html', context)
+    return redirect(reverse_lazy('articles'))
 
 
 class CustomLoginView(LoginView):

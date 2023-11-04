@@ -17,8 +17,9 @@ a {
     color: black;
 }
 
-.underline-anchor {
+.format-anchor {
     text-decoration: underline;
+    color: rgb(61, 4, 61);
 }
 
 a:hover {
@@ -35,12 +36,30 @@ a:hover {
     background-color: rgb(224, 224, 224);
 }
 
+.footer-section p {
+    text-align: center;
+    padding: 40px;
+}
+/* LIKE BUTTON */
+#like-button {
+    font-family: FontAwesome;
+}
+
 #like-button:hover, #save-button:hover {
     color: blue;
     cursor: pointer;
 }
 
-/* Navigation Bar */
+#like-form {
+    float: left;
+    padding-right: 5px;
+}
+
+#save-form-span {
+    float: right; 
+}
+
+/* NAVIGATION BAR */
 .nav-bar-anchor {
     padding: 4px 8px;
     border-radius: 15px;
@@ -61,6 +80,49 @@ a:hover {
     cursor: pointer;
 }
 
+.nav-image img {
+    width: 20px;
+    border-radius: 30px;
+}
+
+#nav-element-box {
+    width: 30%;
+    float: right;
+    margin: auto;
+    padding: 5px;
+}
+
+#nav-bar {
+    border-bottom: 1px solid gray;
+    height: 40px;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+}
+
+/* MENU BAR */
+#menu-bar {
+    border: 1px solid grey;
+    width: 260px;
+    display: none;
+    position: absolute;
+    box-shadow: inset 0 -3em 3em rgba(0, 0, 0, 0.1);
+    background-color: white;
+    right: 10px;
+    top: 40px;
+    border-radius: 10px;
+}
+
+#menu-bar-list {
+    margin: 15px 10px;
+}
+
+#flove {
+    font-family: 'Sofia', sans-serif;
+    color: #000080;
+    font-size: 25px;
+    text-shadow: 1px 1px 1px #ababab;
+}
+
 /* COMMENTS AND REPLIES */
 
 /* Hide reply box, would be activated using JavaScript */
@@ -68,9 +130,23 @@ a:hover {
     display: none;
 }
 
+.reply-box-textarea {
+    width: 100px; height: 30px;
+}
+
 /* Hide button for hiding reply textarea until textarea is displayed using JavaScript */
 #cancel-reply {
     display: none;
+}
+
+#reply-button, #cancel-reply {
+    width: 45px;
+    height: 15px;
+    font-size: 9px;
+}
+
+.reply-list {
+    padding-left: 20px;
 }
 
 /* Hide comments  and button for hiding comments when page is loaded */
@@ -99,7 +175,13 @@ a:hover {
     width: 10px;
     border-radius: 50px;
 }
+#show-comments span, #hide-comments span, #save-button {
+    font-family: FontAwesome;
+}
 
+.comment-writer-name {
+    font-size: 10px;
+}
 
 /* Buttons for hiding and showing  comments */
 #show-reply-box, #cancel-reply {
@@ -108,27 +190,34 @@ a:hover {
     color: rgb(253, 8, 0);
 }
 
-/* Main of div */
+/* MAIN DIV */
 .body-content {
     width: 60%;
     margin: auto;
 }
 
 
-/* Writer's Page */
+/* WRITER'S PAGE */
 .writer-page-body-content {
     width: 60%;
-    padding: 5%;
+    padding: 0 5%;
 }
 
 .writer-page-sidebar {
     width: 26%;
     float: right;
     padding: 2%;
+    border: 1px gray solid;
+    box-shadow: 1px 1px 1px 1px grey;
+    margin-top: 30px;
 }
 
+.writer-page-sidebar img {
+    width: 100px;
+    border-radius: 50px;
+}
 
-/* Article Detail Page */
+/* ARTICLE DETAIL & LIST PAGES */
 .header-writer-image {
     width: 50px;
     border-radius: 30px;
@@ -138,21 +227,92 @@ a:hover {
 
 .article-card {
     border: 1px solid;
-    padding: 20px;
+    padding: 10px 20px 33px 20px;
     border-radius: 20px;
 }
 
-.article-card-image {
+.article-card-img {
     width: 30%;
     float: right;
     border-radius: 30px;
+}
+
+.article-card-writer-img {
+    width: 25px;
+    border-radius: 30px;
+    float: left;
 }
 
 .article-card-text {
     width: 60%;
 }
 
-/* Register Form */
+.article-card-writer-name {
+    clear: right;
+    padding: 4px 0 10px 4px;
+}
+
+.modify-article-icon {
+    margin-left: 4px;
+}
+
+#load-more-button-div {
+    display: flex;
+    justify-content: center;
+}
+
+.article-detail-icon {
+    float: right;
+    padding-left: 4px;
+    cursor: pointer;
+}
+
+#article_img {
+    width: 95%;
+}
+
+#article_audio {
+    width: 95%;
+    height: 50px;
+    display: block;
+}
+
+/* SEARCH */
+#nav-search-form {
+    display: inline;
+    margin-left: 20px;
+}
+
+.search-form-submit-btn {
+    font-family: FontAwesome;
+    border-radius: 15px;
+    padding: 5px; border: 1px solid navy;
+    background-color: #000080;
+    color: aliceblue;
+    cursor: pointer;
+}
+
+.search-input {
+    border-radius: 15px;
+    padding: 5px;
+    border: 1px solid navy;
+}
+
+.search-writer-box {
+    width: 10%;
+    display: inline-block;
+    border: 1px solid navy;
+    text-align: center;
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.search-writer-img {
+    width: 25px;
+    border-radius: 30px;
+}
+
+/* REGISTER FORM */
 .register-form {
     margin: auto;
     width: 50%;
@@ -161,7 +321,7 @@ a:hover {
     border-radius: 10px;
 }
 
-/* For the Messaging Framework */
+/* MESSAGING FRAMEWORK PROMPT */
 .messages {
     width: 75%
 }
@@ -180,4 +340,47 @@ a:hover {
     padding: 10px;
     border-radius: 10px;
     margin-bottom: 5px;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.delete {
+    color: red;
+}
+
+#not-found-img {
+    width: 100%;
+}
+
+#article-img-audio {
+    display: grid; place-items: center;
+}
+
+#menu-bar-img {
+    display: none;
+}
+
+#menu-search-form-span {
+    display: none;
+}
+
+/* MEDIA QUERY */
+@media (max-width: 780px) {
+    .nav-text {
+        display: none;
+    }
+
+    #menu-bar-img {
+        display: inline-block;
+    }
+
+    #nav-search-form {
+        display: none;
+    }
+
+    #menu-search-form-span {
+        display: block;
+    }
 }

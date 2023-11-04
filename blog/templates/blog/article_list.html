@@ -21,7 +21,7 @@
     <div class="info">
         <span>
             Please, kindly create your 
-            <a href="{% url 'new-writer' %}" style="text-decoration: underline;">writer profile</a> 
+            <a href="{% url 'new-writer' %}" class="format-anchor">writer profile</a> 
             to have full access to features.
         </span>
     </div>
@@ -39,9 +39,9 @@
         <h3>{{ query_count }} result{{ query_count|pluralize }} for {{ search_data }}</h3>
         {% if writer_list %}
             <details>
-                <summary style="cursor: pointer;">Writers</summary>
+                <summary class="cursor-pointer">Writers</summary>
                 {% for writer in writer_list %}
-                    <div style="width: 10%; display: inline-block; border: 1px solid navy; text-align: center; padding: 10px; border-radius: 20px;">
+                    <div class="search-writer-box">
                         <a href="{{ writer.get_absolute_url }}">
                             
                             
@@ -53,7 +53,8 @@
                             "
 
                             alt="{{ article.writer }}"
-                            style="width: 25px; border-radius: 30px;"><br>
+                            class="search-writer-img">
+                            <br>
                             <small>{{ writer.first_name }}</small>
                         </a>
                     </div>
@@ -72,7 +73,7 @@
         {% if article.article_status != 'd' %}
 
         <div class="article-card-cover">
-            <div class="article-card" style="border: 1px solid; padding: 10px 20px 33px 20px; border-radius: 20px;">
+            <div class="article-card">
                 <div>
                     <a href="{{ article.writer.get_absolute_url }}">
                         
@@ -85,15 +86,15 @@
                         "
 
                         alt="{{ article.writer }}"
-                        style="width: 25px; border-radius: 30px; float: left;">
-                        <small style="clear: right; padding: 4px 0 10px 4px;" >{{ article.writer }}</small>
+                        class="article-card-writer-img">
+                        <small class="article-card-writer-name">{{ article.writer }}</small>
                     </a>
                 </div>
                 <a href="{{ article.get_absolute_url }}">
                     {% if article.article_img %}
-                        <img src="{{ article.article_img.url }}" alt="" class="article-card-image" style="width: 30%; float: right; border-radius: 30px;">
+                        <img src="{{ article.article_img.url }}" alt="" class="article-card-img">
                     {% endif %}
-                    <div class="article-card-text" style="width: 60%;" >
+                    <div class="article-card-text">
                         <h3>{{ article.title }}</h3>
                         <p>{{ article.text|safe|truncatechars_html:100 }}</p>
                         <small>{{ article.get_article_status_display }}</small>
@@ -101,8 +102,8 @@
                 </a>
 
                 {% if request.user.writer.id == article.writer.id %}
-                <a href="{% url 'update-article' article.writer.user article.article_url %}" title="Edit" style="margin-left: 4px;"><i class="fa-solid fa-pen-nib"></i></a>
-                <a href="{% url 'delete-article' article.writer.user article.article_url %}" title="Delete" style="margin-left: 4px;"><i class="fa-solid fa-trash"></i></a>
+                <a href="{% url 'update-article' article.writer.user article.article_url %}" title="Edit" class="modify-article-icon"><i class="fa-solid fa-pen-nib"></i></a>
+                <a href="{% url 'delete-article' article.writer.user article.article_url %}" title="Delete" class="modify-article-icon"><i class="fa-solid fa-trash"></i></a>
                 {% endif %}
             </div>
             <hr>
@@ -115,7 +116,7 @@
     
     </div>
     {% if page_obj.has_next %}
-        <div style="display: flex; justify-content: center;">
+        <div id="load-more-button-div">
             <button id="load-more-button">Load More</button>
         </div>
     {% endif %}

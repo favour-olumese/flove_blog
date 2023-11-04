@@ -1,3 +1,13 @@
+// Display and hide the menu bar
+$('.user-picture').on("click", function(event) {
+    if ($('#menu-bar').css("display") == 'none'){
+        $('#menu-bar').css("display", "block")
+    }
+    else {
+        $('#menu-bar').css("display", "none")
+    }
+});
+
 // Hide and Unhide Article Reply Box
 
 var form = document.getElementsByClassName('reply-box');

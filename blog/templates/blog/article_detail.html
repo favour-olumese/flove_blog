@@ -69,38 +69,38 @@
             <small>{{ article_time }} read</small>
             
 
-            <span class="article-detail-icon-right" style="float: right; padding-left: 4px;">
+            <span class="article-detail-icon">
 
                 {% if request.user.writer.id == article.writer.id %}
                     <a href="{% url 'update-article' article.writer.user article.article_url %}" title="Edit"><i class="fa-solid fa-pen-nib"></i></a>
                     <a href="{% url 'delete-article' article.writer.user article.article_url %}" title="Delete"><i class="fa-solid fa-trash"></i></a>
                 {% endif %}
             </span>
-            <span style="float: right;">
+            <span id="save-form-span">
                 <!-- Save/Unsave Article -->
                 <form class="save-form">
                     {% csrf_token %}
                     <input type="hidden" name="article_id" value="{{ article.id }}">
 
-                    <input id="save-button" type="submit" style="font-family: FontAwesome"
+                    <input id="save-button" type="submit"
                     value="{% if article in request.user.writer.saved_articles.all %}&#xf02e;{% else %}&#xf097;{% endif %}"
                     title="{% if article in request.user.writer.saved_articles.all %}Unsave{% else %}Save{% endif %}">
                 </form>
             </span>
 
-            <span class="article-detail-icon-right" style="float: right; padding-right: 4px; cursor: pointer;">{% copy_to_clipboard article '<i class="fa-regular fa-clipboard" id="clipboard" ></i>' %}</span>
+            <span class="article-detail-icon">{% copy_to_clipboard article '<i class="fa-regular fa-clipboard" id="clipboard" ></i>' %}</span>
             <hr>
 
-            <div style="display: grid; place-items: center;">
+            <div id="article-img-audio">
                 {% if article.article_img %}
                     <br>
-                    <img src="{{ article.article_img.url }}" alt="" style="width: 95%;">
+                    <img id="article_img" src="{{ article.article_img.url }}">
                 {% endif %}
                 
                 <!-- Article audio -->
                 {% if article.article_audio and article.display_audio == 'y' %}
                     <br>
-                    <audio controls controlsList="nodownload" style="width: 95%; height: 50px; display: block;">
+                    <audio id="article_audio" controls controlsList="nodownload">
                         <source src="{{ article.article_audio.url }}" type="audio/mpeg">
                     </audio>
                 {% endif %}
@@ -113,11 +113,11 @@
             <!-- Article Likes -->
             {% with num_of_likes=article.likes.count %}
 
-            <form id="like-form" style="float: left; padding-right: 5px;">
+            <form id="like-form">
                 {% csrf_token %}
                 <input type="hidden" class="article_id" name="article_id" value="{{ article.id }}">
 
-                <input id="like-button"  style="font-family: FontAwesome" type="submit" 
+                <input id="like-button" type="submit" 
                     value="{% if request.user.writer in article.likes.all %}[&#xf164;{% else %}[&#xf087;{% endif %}"
                     title="{% if request.user.writer in article.likes.all %}Unlike{% else %}Like{% endif %}">
 
@@ -127,11 +127,11 @@
             {% endwith %}
 
             <!-- Social media share button -->
-            <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% post_to_linkedin article %}</span>
-            <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% post_to_facebook article '<i class="fa-brands fa-facebook"></i>' %}</span>
-            <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% post_to_twitter "{{ article.title}}" article '<i class="fa-brands fa-square-x-twitter"></i>' %}</span>
-            <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% post_to_telegram "{{ article.title }}" article '<i class="fa-brands fa-telegram"></i>' %}</span>
-            <span class="article-detail-icon" style="float: right; padding-left: 4px;">{% post_to_whatsapp article '<i class="fa-brands fa-square-whatsapp"></i>' %}</span>
+            <span class="article-detail-icon">{% post_to_linkedin article %}</span>
+            <span class="article-detail-icon">{% post_to_facebook article '<i class="fa-brands fa-facebook"></i>' %}</span>
+            <span class="article-detail-icon">{% post_to_twitter "{{ article.title}}" article '<i class="fa-brands fa-square-x-twitter"></i>' %}</span>
+            <span class="article-detail-icon">{% post_to_telegram "{{ article.title }}" article '<i class="fa-brands fa-telegram"></i>' %}</span>
+            <span class="article-detail-icon">{% post_to_whatsapp article '<i class="fa-brands fa-square-whatsapp"></i>' %}</span>
             <div>
                 <h4>Comment</h4>
                 <!-- For error message in filling of form. -->
@@ -149,7 +149,7 @@
                     <input type="hidden" class="article_id" name="article_id" value="{{ article.id }}">
                     <input type="hidden" name="commenter" value="{{ request.user.writer }}">
 
-                    <textarea id="text" name="text" cols="30" rows="5"></textarea><br>
+                    <textarea id="text" name="text" cols="30" rows="5" placeholder="Enter comment"></textarea><br>
                     <input type="submit" value="Comment">
                 </form>
 
@@ -157,7 +157,7 @@
                 {% if article.comment_set.all %}
                 <small>{{ total_comment }} comment{{ total_comment|pluralize }}</small>
                 <br>
-                <a href="" onclick="show_comments(); return false" id="show-comments"><span style="font-family: FontAwesome">&#xf107;</span> Open comments</a>
+                <a href="" onclick="show_comments(); return false" id="show-comments"><span>&#xf107;</span> Open comments</a>
                 <div id="comment-area">
                     <div id="comment-area-body">
                         {% for comment in article.comment_set.all %}
@@ -171,7 +171,7 @@
                                         {{ comment.commenter.user|gravatar }}
                                         {% endif %}"
                                         alt="" class="comment-image">
-                                        <small style="font-size: 10px;">{{ comment.commenter }} - {{ comment.date }}</small>
+                                        <small class="comment-writer-name">{{ comment.commenter }} - {{ comment.date }}</small>
                                     </a>
 
                                     <!-- Delete comment -->
@@ -194,14 +194,14 @@
                                         <input type="hidden" name="article_id" value="{{ article.id }}">
                                         <input type="hidden" name="comment_id" value="{{ comment.id }}">
 
-                                        <textarea name="reply_text" style="width: 100px; height: 30px;"></textarea><br>
-                                        <input type="submit" value="Reply" style="width: 45px; height: 15px; font-size: 9px;">
-                                        <input type="submit"  id="cancel-reply" onclick="return false" value="Cancel" style="width: 45px; height: 15px; font-size: 9px;">
+                                        <textarea name="reply_text" class="reply-box-textarea"></textarea><br>
+                                        <input type="submit" id="reply-button" value="Reply">
+                                        <input type="submit"  id="cancel-reply" onclick="return false" value="Cancel">
                                     </form>
 
                                     <!-- Comment replies -->
                                     {% if comment.reply_set.all %}
-                                        <ul style="padding-left: 20px;">
+                                        <ul class="reply-list">
                                             {% for reply in comment.reply_set.all %}
                                             <li>
                                                 <a href="{{ reply.replier.get_absolute_url }}">
@@ -211,7 +211,7 @@
                                                     {{ reply.replier.user|gravatar }}
                                                     {% endif %}"
                                                     alt="" class="reply-image">
-                                                    <small style="font-size: 10px;">{{ reply.replier }} - {{ reply.date }}</small>
+                                                    <small class="comment-writer-name">{{ reply.replier }} - {{ reply.date }}</small>
                                                 </a>
                                                 
                                                 <!-- Delete comment reply -->
@@ -234,7 +234,7 @@
                         {% endfor %}
                     </div>
                 </div>
-                <a href="" onclick="hide_comments(); return false" id="hide-comments"><span style="font-family: FontAwesome">&#xf106;</span> Close comments</a>
+                <a href="" onclick="hide_comments(); return false" id="hide-comments"><span>&#xf106;</span> Close comments</a>
                 {% endif %}
             </div>
 
@@ -248,7 +248,7 @@
                     <div class="article-card">
                         <a href="{{ article.get_absolute_url }}">
                             {% if article.article_img %}
-                                <img src="{{ article.article_img.url }}" alt="" class="article-card-image">
+                                <img src="{{ article.article_img.url }}" alt="" class="article-card-img">
                             {% endif %}
                             <div class="article-card-text">
                                 <h3>{{ article.title }}</h3>

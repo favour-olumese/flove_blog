@@ -21,14 +21,14 @@
 {% endblock %}
 
 {% block sidebar %}
-    <div class="writer-page-sidebar" style="border: 1px gray solid; box-shadow: 1px 1px 1px 1px grey; margin-top: 30px;">
+    <div id="writer-page-sidebar">
         
         <img src="{% if writer.profile_picture %}
         {{ writer.profile_picture.url }}
         {% else %}
         {{ writer.user|gravatar }}
         {% endif %}"
-        alt="" style="width: 100px; border-radius: 50px;">
+        alt="{{ writer }}">
         
         <h3>{{ writer }}</h3>
 
@@ -73,7 +73,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="writer-page-body-content" style="padding: 0 5%;">
+<div class="writer-page-body-content">
     {% if request.user == writer.user %}
 
         <!-- Form for filtering articles -->
@@ -106,12 +106,12 @@
             <div></div>
         
         {% else %}
-            <div class="article-card" style="border: 1px solid; padding: 10px 20px 33px 20px; border-radius: 20px;">
+            <div class="article-card">
                 <a href="{{ article.get_absolute_url }}">
                     {% if article.article_img %}
-                        <img src="{{ article.article_img.url }}" alt="" class="article-card-image" style="width: 30%; float: right; border-radius: 30px;">
+                        <img src="{{ article.article_img.url }}" alt="" class="article-card-img">
                     {% endif %}
-                    <div class="article-card-text" style="width: 60%;" >
+                    <div class="article-card-text">
                         <h3>{{ article.title }}</h3>
                         <p>{{ article.text|safe|truncatechars_html:100 }}</p>
                         <small>{{ article.get_article_status_display }}</small>
@@ -119,8 +119,8 @@
                 </a>
 
                 {% if request.user == article.writer.user %}
-                    <a href="{% url 'update-article' article.writer.user article.article_url %}" title="Edit" style="margin-left: 4px;"><i class="fa-solid fa-pen-nib"></i></a>
-                    <a href="{% url 'delete-article' article.writer.user article.article_url %}" title="Delete" style="margin-left: 4px;"><i class="fa-solid fa-trash"></i></a>
+                    <a href="{% url 'update-article' article.writer.user article.article_url %}" title="Edit" class="modify-article-icon"><i class="fa-solid fa-pen-nib"></i></a>
+                    <a href="{% url 'delete-article' article.writer.user article.article_url %}" title="Delete" class="modify-article-icon"><i class="fa-solid fa-trash"></i></a>
                 {% endif %}
             </div>
             <hr>
