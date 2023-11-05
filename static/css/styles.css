@@ -203,7 +203,7 @@ a:hover {
     padding: 0 5%;
 }
 
-.writer-page-sidebar {
+#writer-page-sidebar {
     width: 26%;
     float: right;
     padding: 2%;
@@ -212,7 +212,7 @@ a:hover {
     margin-top: 30px;
 }
 
-.writer-page-sidebar img {
+#writer-page-sidebar img {
     width: 100px;
     border-radius: 50px;
 }
