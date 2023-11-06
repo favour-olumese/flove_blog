@@ -254,8 +254,8 @@ class ArticleDetailView(DetailView):
         context['more_article'] = more_article
 
         # Addition of number of comments and replies
-        comment_count =  Article.objects.filter(id=31).get().comment_set.all().count()
-        reply_count =  Article.objects.filter(id=31).get().reply_set.all().count()
+        comment_count =  Article.objects.filter(article_url=article_url).get().comment_set.all().count()
+        reply_count =  Article.objects.filter(article_url=article_url).get().reply_set.all().count()
 
         total_comment = comment_count + reply_count
 
