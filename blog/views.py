@@ -903,19 +903,19 @@ def search(request):
 
     writer_list = Writer.objects.filter(Q(first_name__icontains=search_data) |
                                         Q(last_name__icontains=search_data) |
-                                        Q(user__email=search_data) |
+                                        Q(user__email=search_data, display_email=True) |
                                         Q(user__username=search_data)
-                                        ).exclude(display_email=False)
+                                        )
 
     article_list = Article.objects.filter(Q(title__icontains=search_data) |
                                           Q(text__icontains=search_data) |
                                           Q(writer__first_name__icontains=search_data) |
                                           Q(writer__last_name__icontains=search_data) |
-                                          Q(writer__user__email=search_data) |
+                                          Q(writer__user__email=search_data, writer__display_email=True) |
                                           Q(writer__user__username=search_data)
                                           ).exclude(Q(article_status='d') |
-                                                    Q(article_status='u') |
-                                                    Q(writer__display_email=False))
+                                                    Q(article_status='u')
+                                                    )
 
     query_count = len(writer_list) + len(article_list)
 
