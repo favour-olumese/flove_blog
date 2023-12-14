@@ -64,4 +64,4 @@
 * **SMTP Provider:** Consider exploring alternative SMTP providers, as occasional errors or delays in message delivery have been observed with Gmail.
 * **Article Saving:** Implement the ability to save/unsave an article directly from the article list or writer's page.
 * **Bookmarking Unlisted Articles:** Unlisted articles are bookmarkable and public articles converted to unlisted are still bookmarked though not visible.
-* Consider making unlisted articles un-bookmarkable and public articles made unlisted unbookmarked
+Consider making unlisted articles un-bookmarkable and public articles made unlisted unbookmarked
